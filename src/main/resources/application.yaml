@@ -2,5 +2,22 @@ spring:
   application:
     name: product-service
 
+  datasource:
+    url: jdbc:mysql://localhost:3306/product_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD:12345}
+    hikari:
+      pool-name: SpringBootMysqlPool
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate # CRÍTICO: O Hibernate apenas valida, o Flyway comanda a estrutura
+
+  flyway:
+    locations:
+      - classpath:db/migration
+    baseline-on-migrate: true
+
 server:
   port: 8081

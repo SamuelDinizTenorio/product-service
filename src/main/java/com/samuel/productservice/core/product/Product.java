@@ -1,6 +1,7 @@
 package com.samuel.productservice.core.product;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.samuel.productservice.core.exception.NotificationException;
@@ -8,7 +9,6 @@ import com.samuel.productservice.core.validation.NotificationError;
 import com.samuel.productservice.core.validation.NotificationValidation;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /**
  * Represents a product domain entity with business rule validation.
@@ -18,13 +18,12 @@ import lombok.NoArgsConstructor;
  * price.
  */
 @Getter
-@NoArgsConstructor
 public class Product {
 
     /**
      * The unique identifier of the product.
      */
-    private String id;
+    private UUID id;
 
     /**
      * The stock keeping unit identifier.
@@ -69,7 +68,7 @@ public class Product {
      *                               business invariants
      */
     private Product(
-            final String id,
+            final UUID id,
             final String sku,
             final String name,
             final BigDecimal stock,
@@ -107,7 +106,36 @@ public class Product {
             final BigDecimal stock,
             final BigDecimal cost,
             final BigDecimal price) {
-        final var id = UUID.randomUUID().toString();
+        final var id = UUID.randomUUID();
+        return new Product(id, sku, name, stock, cost, price);
+    }
+
+    /**
+     * Reconstitutes an existing {@link Product} aggregate from a known persistent
+     * state.
+     * <p>
+     * This factory method bypasses new entity initialization workflows, allowing
+     * the domain layer to safely reload established state from data stores.
+     *
+     * @param id    the unique {@link UUID} identifier of the product
+     * @param sku   the stock keeping unit identifier
+     * @param name  the product name
+     * @param stock the current stock quantity
+     * @param cost  the unit cost value
+     * @param price the commercial selling price
+     * @return a {@link Product} instance populated with the specified state
+     * @throws NullPointerException if the specified {@code id}
+     *                              argument is {@code null}
+     */
+    public static Product reconstitute(
+            final UUID id,
+            final String sku,
+            final String name,
+            final BigDecimal stock,
+            final BigDecimal cost,
+            final BigDecimal price) {
+        Objects.requireNonNull(id, "Product identity (ID) cannot be null during reconstitution");
+
         return new Product(id, sku, name, stock, cost, price);
     }
 
