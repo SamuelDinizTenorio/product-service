@@ -1,0 +1,43 @@
+name: Java CI con Maven
+
+# 1. Defines when the pipeline will be executed
+on:
+  push:
+    branches: ["main", "master", "develop"]
+  pull_request:
+    branches: ["main", "master"]
+
+# 2. Define the jobs the pipeline will run.
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download the code from the repository to the GitHub virtual machine.
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Step 2: Install and configure the JDK (Java Development Kit)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven" # Enables automatic Maven caching (.m2)
+
+      # Step 3: Grant execution permission to the Maven Wrapper (if your project uses it)
+      - name: Grant execute permission for mvnw
+        run: chmod +x mvnw
+
+      # Step 4: Compile the project and run ALL tests (Unit and Integration)
+      - name: Run Build and Tests with Maven
+        run: ./mvnw clean test
+
+      # Step 5: Publish test reports if a failure occurs.
+      # This helps audit errors directly via the GitHub interface.
+      - name: Upload Test Reports
+        if: failure() # Only run this step if the previous step (tests) fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-reports
+          path: "**/target/surefire-reports/"
