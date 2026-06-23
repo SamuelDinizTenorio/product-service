@@ -16,8 +16,8 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: product_db
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -43,9 +43,9 @@ jobs:
       - name: Run Build and Tests with Maven
         run: ./mvnw clean test
         env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/${{ secrets.MYSQL_DATABASE }}
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/product_db?allowPublicKeyRetrieval=true&useSSL=false
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: root
 
       # Step 5: Publish test reports if a failure occurs.
       # This helps audit errors directly via the GitHub interface.
