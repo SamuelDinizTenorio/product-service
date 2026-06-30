@@ -12,16 +12,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: product_db
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
       # Step 1: Download the code from the repository to the GitHub virtual machine.
       - name: Checkout source code
@@ -42,10 +32,6 @@ jobs:
       # Step 4: Compile the project and run ALL tests (Unit and Integration)
       - name: Run Build and Tests with Maven
         run: ./mvnw clean test
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/product_db?allowPublicKeyRetrieval=true&useSSL=false
-          SPRING_DATASOURCE_USERNAME: root
-          SPRING_DATASOURCE_PASSWORD: root
 
       # Step 5: Publish test reports if a failure occurs.
       # This helps audit errors directly via the GitHub interface.

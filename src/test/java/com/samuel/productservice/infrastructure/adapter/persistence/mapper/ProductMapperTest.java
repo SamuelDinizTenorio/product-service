@@ -1,34 +1,21 @@
-package com.samuel.productservice.infrastructure.mapper;
+package com.samuel.productservice.infrastructure.adapter.persistence.mapper;
 
-import com.samuel.productservice.core.product.Product;
-import com.samuel.productservice.infrastructure.persistence.entity.ProductEntity;
+import com.samuel.productservice.core.product.model.Product;
+import com.samuel.productservice.infrastructure.adapter.persistence.entity.ProductEntity;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("ProductMapper Unit Tests")
 class ProductMapperTest {
 
-    @Test
-    @DisplayName("Should throw UnsupportedOperationException when trying to instantiate utility class via reflection")
-    void shouldThrowExceptionWhenInstantiatingUtilityClass() throws NoSuchMethodException {
-        // Arrange
-        final var constructor = ProductMapper.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-
-        // Act & Assert
-        assertThatThrownBy(constructor::newInstance)
-                .isInstanceOf(InvocationTargetException.class)
-                .hasCauseInstanceOf(UnsupportedOperationException.class)
-                .hasStackTraceContaining("This is a utility class and cannot be instantiated");
-    }
+    private final ProductMapper productMapper = new ProductMapper();
 
     @Nested
     @DisplayName("toNewEntity Mapping Tests")
@@ -46,7 +33,7 @@ class ProductMapperTest {
                     BigDecimal.valueOf(299.90));
 
             // Act
-            final var entity = ProductMapper.toNewEntity(product);
+            final var entity = productMapper.toNewEntity(product);
 
             // Assert
             assertThat(entity).isNotNull();
@@ -63,7 +50,7 @@ class ProductMapperTest {
         @DisplayName("Should return null when source product is null")
         void shouldReturnNullWhenProductIsNull() {
             // Act
-            final var entity = ProductMapper.toNewEntity(null);
+            final var entity = productMapper.toNewEntity(null);
 
             // Assert
             assertThat(entity).isNull();
@@ -88,7 +75,7 @@ class ProductMapperTest {
                     BigDecimal.valueOf(299.90));
 
             // Act
-            final var entity = ProductMapper.toUpdateEntity(product);
+            final var entity = productMapper.toUpdateEntity(product);
 
             // Assert
             assertThat(entity).isNotNull();
@@ -105,7 +92,7 @@ class ProductMapperTest {
         @DisplayName("Should return null when source product is null")
         void shouldReturnNullWhenProductIsNull() {
             // Act
-            final var entity = ProductMapper.toUpdateEntity(null);
+            final var entity = productMapper.toUpdateEntity(null);
 
             // Assert
             assertThat(entity).isNull();
@@ -131,7 +118,7 @@ class ProductMapperTest {
                     false);
 
             // Act
-            final var product = ProductMapper.toDomain(entity);
+            final var product = productMapper.toDomain(entity);
 
             // Assert
             assertThat(product).isNotNull();
@@ -147,7 +134,7 @@ class ProductMapperTest {
         @DisplayName("Should return null when source entity is null")
         void shouldReturnNullWhenEntityIsNull() {
             // Act
-            final var product = ProductMapper.toDomain(null);
+            final var product = productMapper.toDomain(null);
 
             // Assert
             assertThat(product).isNull();

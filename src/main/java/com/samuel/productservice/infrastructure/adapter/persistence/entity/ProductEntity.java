@@ -1,10 +1,13 @@
-package com.samuel.productservice.infrastructure.persistence.entity;
+package com.samuel.productservice.infrastructure.adapter.persistence.entity;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.domain.Persistable;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.PostLoad;
@@ -34,11 +37,12 @@ public class ProductEntity implements Persistable<UUID> {
     /**
      * The primary key identifier of the product.
      * <p>
-     * Stored as a 36-character string representation of the UUID to maintain
-     * readability and compatibility within the MySQL schema.
+     * Stored as a 36-character string representation of the {@link java.util.UUID}
+     * to maintain readability and compatibility within the MySQL schema.
      */
     @Id
-    @jakarta.persistence.Column(columnDefinition = "VARCHAR(36)")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(columnDefinition = "VARCHAR(36)")
     private UUID id;
 
     /**
