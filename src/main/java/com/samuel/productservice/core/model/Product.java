@@ -1,4 +1,4 @@
-package com.samuel.productservice.core.product.model;
+package com.samuel.productservice.core.model;
 
 import java.math.BigDecimal;
 import java.util.Objects;

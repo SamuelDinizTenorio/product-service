@@ -2,7 +2,7 @@ package com.samuel.productservice.infrastructure.adapter.persistence.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.samuel.productservice.core.product.model.Product;
+import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.infrastructure.adapter.persistence.entity.ProductEntity;
 
 /**

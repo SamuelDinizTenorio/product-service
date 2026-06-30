@@ -1,9 +1,9 @@
-package com.samuel.productservice.core.product.repository;
+package com.samuel.productservice.core.repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import com.samuel.productservice.core.product.model.Product;
+import com.samuel.productservice.core.model.Product;
 
 /**
  * Defines the architectural contract for persisting and retrieving
@@ -39,4 +39,17 @@ public interface ProductRepository {
      *         persistence-tier side effects
      */
     Product save(Product product);
+
+    /**
+     * Updates the persistent state of an existing product aggregate.
+     * <p>
+     * This method assumes that the product already exists in the underlying
+     * storage and modifies its state according to the provided domain object.
+     *
+     * @param product the {@link Product} domain aggregate containing the updated
+     *                state to persist; must not be {@code null}
+     * @return the updated {@link Product} aggregate instance reflecting any
+     *         persistence-tier side effects
+     */
+    Product update(Product product);
 }

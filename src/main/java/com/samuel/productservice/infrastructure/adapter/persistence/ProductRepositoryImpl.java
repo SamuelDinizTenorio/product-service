@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import com.samuel.productservice.core.product.model.Product;
-import com.samuel.productservice.core.product.repository.ProductRepository;
+import com.samuel.productservice.core.model.Product;
+import com.samuel.productservice.core.repository.ProductRepository;
 import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductMapper;
 
 import lombok.AllArgsConstructor;
@@ -72,4 +72,23 @@ public class ProductRepositoryImpl implements ProductRepository {
         return mapper.toDomain(savedEntity);
     }
 
+    /**
+     * Updates the persistent state of an existing product aggregate in the
+     * relational database.
+     * <p>
+     * This implementation translates the domain model into an update-specific
+     * entity configuration (explicitly flagging it as an existing record), executes
+     * the update via the underlying JPA provider, and returns a freshly
+     * reconstituted domain aggregate reflecting the updated database state.
+     *
+     * @param product the {@link Product} domain aggregate containing updated state;
+     *                must not be {@code null}
+     * @return the updated and reconstituted {@link Product} aggregate instance
+     */
+    @Override
+    public Product update(Product product) {
+        var entity = mapper.toUpdateEntity(product);
+        var savedEntity = repository.save(entity);
+        return mapper.toDomain(savedEntity);
+    }
 }

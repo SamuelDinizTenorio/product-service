@@ -1,4 +1,4 @@
-package com.samuel.productservice.core.product;
+package com.samuel.productservice.core.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,7 +15,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.samuel.productservice.core.exception.NotificationException;
-import com.samuel.productservice.core.product.model.Product;
 
 @DisplayName("Product Domain Entity Tests")
 public class ProductTest {
@@ -78,7 +77,7 @@ public class ProductTest {
                 }
 
                 @ParameterizedTest
-                @MethodSource("com.samuel.productservice.core.product.ProductTest#getPossiblesOfValueProduct")
+                @MethodSource("com.samuel.productservice.core.model.ProductTest#getPossiblesOfValueProduct")
                 @DisplayName("Should not create product with invalid data")
                 void shouldNotInstanceNewProduct(String sku, String name, BigDecimal stock, BigDecimal cost,
                                 BigDecimal price,
@@ -170,7 +169,7 @@ public class ProductTest {
                 }
 
                 @ParameterizedTest
-                @MethodSource("com.samuel.productservice.core.product.ProductTest#getPossiblesOfValueProduct")
+                @MethodSource("com.samuel.productservice.core.model.ProductTest#getPossiblesOfValueProduct")
                 @DisplayName("Should not reconstitute product if persistent data violates domain rules")
                 void shouldNotReconstituteProductWithInvalidData(
                                 String sku, String name, BigDecimal stock, BigDecimal cost, BigDecimal price,
@@ -246,7 +245,7 @@ public class ProductTest {
                 }
 
                 @ParameterizedTest
-                @MethodSource("com.samuel.productservice.core.product.ProductTest#getPossiblesOfValueProduct")
+                @MethodSource("com.samuel.productservice.core.model.ProductTest#getPossiblesOfValueProduct")
                 @DisplayName("Should not update product with invalid data")
                 void shouldInstanceNewProductAndNotUpdate(String sku, String name, BigDecimal stock, BigDecimal cost,
                                 BigDecimal price, String expectedMessage) {

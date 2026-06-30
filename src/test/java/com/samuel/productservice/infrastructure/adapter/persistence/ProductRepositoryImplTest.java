@@ -8,14 +8,10 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.samuel.productservice.core.product.model.Product;
+import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductMapper;
 import com.samuel.productservice.infrastructure.config.BaseContainersIntegrationTest;
 
@@ -42,20 +38,29 @@ public class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         @DisplayName("Should retrieve an existing product by its unique identifier")
         void shouldFindProductById() {
             // Arrange
-            var productId = UUID.randomUUID();
-            var product = Product.reconstitute(productId, "SKU-TC-02", "Teclado Mecânico", BigDecimal.ONE,
-                    BigDecimal.valueOf(50), BigDecimal.valueOf(120));
-
-            // Persiste o cenário inicial
+            var product = createDummyProduct("FIND");
+            var productId = product.getId();
             productRepository.save(product);
+
+            // Flush/Clear to ensure that findById fetches from the actual database rather
+            // than the Hibernate cache.
+            entityManager.flush();
+            entityManager.clear();
 
             // Act
             var foundProduct = productRepository.findById(productId);
 
             // Assert
-            assertThat(foundProduct).isPresent();
-            assertThat(foundProduct.get().getSku()).isEqualTo("SKU-TC-02");
-            assertThat(foundProduct.get().getName()).isEqualTo("Teclado Mecânico");
+            assertThat(foundProduct)
+                    .isPresent()
+                    .hasValueSatisfying(actualProduct -> {
+                        assertThat(actualProduct.getId()).isEqualTo(product.getId());
+                        assertThat(actualProduct.getSku()).isEqualTo(product.getSku());
+                        assertThat(actualProduct.getName()).isEqualTo(product.getName());
+                        assertThat(actualProduct.getStock()).isEqualByComparingTo(product.getStock());
+                        assertThat(actualProduct.getCost()).isEqualByComparingTo(product.getCost());
+                        assertThat(actualProduct.getPrice()).isEqualByComparingTo(product.getPrice());
+                    });
         }
 
         @Test
@@ -77,19 +82,12 @@ public class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         @DisplayName("Should persist a new product successfully and handle isNew lifecycle properly")
         void shouldPersistNewProduct() {
             // Arrange
-            var productId = UUID.randomUUID();
-            var product = Product.reconstitute(
-                    productId,
-                    "SKU-TC-01",
-                    "Mouse Gamer Testcontainers",
-                    BigDecimal.TEN,
-                    BigDecimal.valueOf(100),
-                    BigDecimal.valueOf(200));
+            var product = createDummyProduct("SAVE");
+            var productId = product.getId();
 
             // Act
             var savedProduct = productRepository.save(product);
 
-            // Forces the recording and clears the first-level cache
             entityManager.flush();
             entityManager.clear();
 
@@ -97,11 +95,85 @@ public class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             assertThat(savedProduct).isNotNull();
             assertThat(savedProduct.getId()).isEqualTo(productId);
 
-            // Physical verification on the actual database running in the container
             var entityInDatabase = jpaProductRepository.findById(productId);
-            assertThat(entityInDatabase).isPresent();
-            assertThat(entityInDatabase.get().getName()).isEqualTo("Mouse Gamer Testcontainers");
+            assertThat(entityInDatabase)
+                    .isPresent()
+                    .hasValueSatisfying(entity -> {
+                        assertThat(entity.getId()).isEqualTo(product.getId());
+                        assertThat(entity.getSku()).isEqualTo(product.getSku());
+                        assertThat(entity.getName()).isEqualTo(product.getName());
+                        assertThat(entity.getStock()).isEqualByComparingTo(product.getStock());
+                        assertThat(entity.getCost()).isEqualByComparingTo(product.getCost());
+                        assertThat(entity.getPrice()).isEqualByComparingTo(product.getPrice());
+                    });
+
+            // Once persisted and reloaded from the database, the JPA record's `isNew` flag
+            // should be `false`.
             assertThat(entityInDatabase.get().isNew()).isFalse();
         }
+    }
+
+    @Nested
+    @DisplayName("Updating Products")
+    class UpdateOperations {
+
+        @Test
+        @DisplayName("Should update an existing product successfully modifying its database record")
+        void shouldUpdateExistingProduct() {
+            // Arrange
+            // Creates and persists the original product in the database.
+            var originalProduct = createDummyProduct("UPDATE");
+            var productId = originalProduct.getId();
+            productRepository.save(originalProduct);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            // Modifies the object's state using the rich domain's business method.
+            var productToUpdate = productRepository.findById(productId).orElseThrow();
+            productToUpdate.update(
+                    "SKU-UPDATE-02", // New SKU
+                    "Monitor Gamer Ultrawide", // New Name
+                    BigDecimal.valueOf(5), // New Stock
+                    BigDecimal.valueOf(500), // New Cost
+                    BigDecimal.valueOf(900) // New Price
+            );
+
+            // Act - Executes the update that uses toUpdateEntity(isNew = false).
+            var updatedProduct = productRepository.update(productToUpdate);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            // Assert
+            assertThat(updatedProduct).isNotNull();
+            assertThat(updatedProduct.getId()).isEqualTo(productId);
+            assertThat(updatedProduct.getName()).isEqualTo("Monitor Gamer Ultrawide");
+
+            // Physical Verification – Ensures that the changes were actually committed to
+            // the database within the container.
+            var entityInDatabase = jpaProductRepository.findById(productId);
+            assertThat(entityInDatabase)
+                    .isPresent()
+                    .hasValueSatisfying(entity -> {
+                        assertThat(entity.getId()).isEqualTo(updatedProduct.getId());
+                        assertThat(entity.getSku()).isEqualTo(updatedProduct.getSku());
+                        assertThat(entity.getName()).isEqualTo(updatedProduct.getName());
+                        assertThat(entity.getStock()).isEqualByComparingTo(updatedProduct.getStock());
+                        assertThat(entity.getCost()).isEqualByComparingTo(updatedProduct.getCost());
+                        assertThat(entity.getPrice()).isEqualByComparingTo(updatedProduct.getPrice());
+                        assertThat(entity.isNew()).isFalse(); // It remains false because it was an
+                                                              // update.
+                    });
+        }
+    }
+
+    private Product createDummyProduct(String suffix) {
+        return Product.create(
+                "SKU-TEST-" + suffix,
+                "Product Test " + suffix,
+                BigDecimal.ONE,
+                BigDecimal.valueOf(100),
+                BigDecimal.valueOf(200));
     }
 }

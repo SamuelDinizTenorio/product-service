@@ -1,6 +1,6 @@
 package com.samuel.productservice.infrastructure.adapter.persistence.mapper;
 
-import com.samuel.productservice.core.product.model.Product;
+import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.infrastructure.adapter.persistence.entity.ProductEntity;
 
 import org.junit.jupiter.api.DisplayName;
