@@ -2,10 +2,12 @@ package com.samuel.productservice.infrastructure.config;
 
 import java.time.Duration;
 
+import org.junit.jupiter.api.Timeout;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 /**
@@ -19,7 +21,9 @@ import org.testcontainers.utility.DockerImageName;
  * environment.
  */
 @DataJpaTest
+@Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Timeout(value = 10, unit = java.util.concurrent.TimeUnit.SECONDS)
 public abstract class BaseContainersIntegrationTest {
 
     /**

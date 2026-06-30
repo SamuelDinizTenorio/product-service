@@ -21,11 +21,7 @@ import com.samuel.productservice.infrastructure.config.BaseContainersIntegration
 
 import jakarta.persistence.EntityManager;
 
-@DataJpaTest
-@Testcontainers
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({ ProductRepositoryImpl.class, ProductMapper.class })
-@Timeout(value = 10, unit = java.util.concurrent.TimeUnit.SECONDS)
 @DisplayName("ProductRepositoryImpl Integration Tests with Testcontainers")
 public class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
 
