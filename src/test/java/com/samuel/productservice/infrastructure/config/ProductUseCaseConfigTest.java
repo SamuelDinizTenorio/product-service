@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DisplayName("ProductUseCaseConfig Test")
-public class ProductUseCaseConfigTest {
+public class ProductUseCaseConfigTest extends BaseIntegrationTest {
 
     @Autowired
     private ApplicationContext context;
