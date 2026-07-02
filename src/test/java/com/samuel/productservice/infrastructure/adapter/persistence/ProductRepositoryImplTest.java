@@ -19,7 +19,7 @@ import jakarta.persistence.EntityManager;
 
 @Import({ ProductRepositoryImpl.class, ProductMapper.class })
 @DisplayName("ProductRepositoryImpl Integration Tests with Testcontainers")
-public class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
+class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
 
     @Autowired
     private ProductRepositoryImpl productRepository;

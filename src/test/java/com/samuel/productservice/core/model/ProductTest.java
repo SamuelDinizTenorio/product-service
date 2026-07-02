@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.samuel.productservice.core.exception.NotificationException;
 
 @DisplayName("Product Domain Entity Tests")
-public class ProductTest {
+class ProductTest {
 
         private static Stream<Arguments> getPossiblesOfValueProduct() {
                 final var bigText = "a".repeat(201);
