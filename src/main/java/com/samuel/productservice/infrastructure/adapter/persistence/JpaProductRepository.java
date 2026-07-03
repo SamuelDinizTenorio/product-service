@@ -1,5 +1,6 @@
 package com.samuel.productservice.infrastructure.adapter.persistence;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,15 @@ import com.samuel.productservice.infrastructure.adapter.persistence.entity.Produ
 @Repository
 public interface JpaProductRepository extends JpaRepository<ProductEntity, UUID> {
 
+    /**
+     * Executes a derived query to locate a specific product record by its unique
+     * stock keeping unit.
+     *
+     * @param sku the {@link String} representing the stock keeping unit to match;
+     *            must not be {@code null}
+     * @return an {@link Optional} containing the found {@link ProductEntity}
+     *         instance, or an empty {@link Optional} if no record matches the
+     *         specified SKU
+     */
+    Optional<ProductEntity> findBySku(String sku);
 }

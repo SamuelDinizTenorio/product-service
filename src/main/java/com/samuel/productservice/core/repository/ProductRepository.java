@@ -27,6 +27,16 @@ public interface ProductRepository {
     Optional<Product> findById(UUID id);
 
     /**
+     * Retrieves a product aggregate by its unique stock keeping unit.
+     *
+     * @param sku the unique {@link String} stock keeping unit to find; must not be
+     *            {@code null}
+     * @return an {@link Optional} containing the matching {@link Product}, or an
+     *         empty {@link Optional} if no product matches the specified SKU
+     */
+    Optional<Product> findBySku(String sku);
+
+    /**
      * Persists the state of the given product aggregate.
      * <p>
      * Implementations must handle both initial insertion and updates of existing

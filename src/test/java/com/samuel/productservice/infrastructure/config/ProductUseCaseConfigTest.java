@@ -2,6 +2,7 @@ package com.samuel.productservice.infrastructure.config;
 
 import com.samuel.productservice.core.usecase.CreateProductUseCase;
 import com.samuel.productservice.core.usecase.GetProductByIdUseCase;
+import com.samuel.productservice.core.usecase.GetProductBySkuUseCase;
 import com.samuel.productservice.core.usecase.UpdateProductUseCase;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ class ProductUseCaseConfigTest extends BaseIntegrationTest {
     void shouldRegisterAllUseCaseBeansInApplicationContext() {
         // Act & Assert
         assertThat(context.getBean(GetProductByIdUseCase.class)).isNotNull();
+        assertThat(context.getBean(GetProductBySkuUseCase.class)).isNotNull();
         assertThat(context.getBean(CreateProductUseCase.class)).isNotNull();
         assertThat(context.getBean(UpdateProductUseCase.class)).isNotNull();
     }

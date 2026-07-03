@@ -6,12 +6,12 @@ import com.samuel.productservice.core.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 
 /**
- * Orchestrates the business logic for creating and persisting a new product in
- * the system.
+ * Use case responsible for orchestrating the creation and persistence of a new
+ * product.
  * <p>
- * This use case serves as a domain boundary component that validates the
- * creation contract and delegates the persistence operations to the underlying
- * repository layer.
+ * This class acts as a domain boundary, receiving data for a new product and
+ * delegating validation and persistence to the appropriate layers (domain model
+ * and repository).
  */
 @AllArgsConstructor
 public class CreateProductUseCase {
@@ -22,12 +22,16 @@ public class CreateProductUseCase {
     private final ProductRepository repository;
 
     /**
-     * Executes the business logic to create and save a new product.
+     * Executes the use case to create and save a new product.
+     * <p>
+     * The creation of the {@link Product} entity itself enforces the necessary
+     * domain validations. If the data is valid, the new entity is passed to the
+     * {@link ProductRepository} to be persisted.
      *
      * @param newProduct the {@link Product} entity representing the new product
      *                   details to be persisted; must not be {@code null}
-     * @return the persisted {@link Product} entity, populated with any
-     *         system-generated attributes
+     * @return the persisted {@link Product} entity, which may include
+     *         system-generated attributes (such as the ID)
      */
     public Product execute(Product newProduct) {
         return repository.save(newProduct);

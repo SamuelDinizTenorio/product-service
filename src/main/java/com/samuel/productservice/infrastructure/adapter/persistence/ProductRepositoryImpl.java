@@ -53,6 +53,22 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     /**
+     * Retrieves a product aggregate from the relational database by its stock
+     * keeping unit.
+     *
+     * @param sku the unique {@link String} identifier representing the product SKU;
+     *            must not be {@code null}
+     * @return an {@link Optional} containing the reconstituted {@link Product}
+     *         aggregate if a matching record exists; an empty {@link Optional}
+     *         otherwise
+     */
+    @Override
+    public Optional<Product> findBySku(String sku) {
+        return repository.findBySku(sku)
+                .map(mapper::toDomain);
+    }
+
+    /**
      * Persists the current state of a product aggregate into the relational
      * database.
      * <p>

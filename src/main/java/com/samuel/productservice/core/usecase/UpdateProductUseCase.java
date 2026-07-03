@@ -8,12 +8,11 @@ import com.samuel.productservice.core.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 
 /**
- * Orchestrates the business logic for updating an existing product within the
- * system.
+ * Use case responsible for orchestrating the update of an existing product.
  * <p>
- * This use case acts as a domain boundary component that fetches the current
- * state of a product, mutates its attributes using the provided data tracking
- * business invariants, and updates the state through the persistence layer.
+ * This class coordinates the domain logic to ensure a product is first
+ * retrieved, then modified with new data (respecting domain invariants), and
+ * finally persisted back to the system.
  */
 @AllArgsConstructor
 public class UpdateProductUseCase {
@@ -30,11 +29,12 @@ public class UpdateProductUseCase {
     private final GetProductByIdUseCase getProductByIdUseCase;
 
     /**
-     * Executes the update lifecycle for a specific product entity.
+     * Executes the use case to update a product based on its ID.
      * <p>
-     * Fetches the current entity using the given identifier, applies the new state
-     * attributes from {@code productData}, and commits the changes to the
-     * underlying storage.
+     * Retrieves the existing {@link Product} entity, applies the changes from
+     * {@code productData}, and delegates the update operation to the
+     * {@link ProductRepository}. Domain validation rules are enforced during the
+     * entity's {@code update} method call.
      *
      * @param id          the unique identifier of the product to be updated; must
      *                    not be {@code null}
@@ -42,8 +42,6 @@ public class UpdateProductUseCase {
      *                    to apply to the existing record
      * @return the updated {@link Product} entity after persistent storage
      *         synchronization
-     * @throws RuntimeException if the product with the specified {@code id} cannot
-     *                          be found
      */
     public Product execute(UUID id, Product productData) {
         var existingProduct = getProductByIdUseCase.execute(id);

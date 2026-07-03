@@ -9,11 +9,12 @@ import com.samuel.productservice.core.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 
 /**
- * Orchestrates the business logic for retrieving a specific product by its
- * unique identifier.
+ * Use case responsible for retrieving a product based on its unique identifier
+ * (ID).
  * <p>
- * This use case serves as a boundary component that interacts with the domain's
- * persistence layer to guarantee product existence before processing.
+ * This class coordinates the domain logic to ensure that a product exists for
+ * the requested identifier, establishing a bridge between the application entry
+ * points and the underlying persistence layer.
  */
 @AllArgsConstructor
 public class GetProductByIdUseCase {
@@ -24,13 +25,15 @@ public class GetProductByIdUseCase {
     private final ProductRepository repository;
 
     /**
-     * Executes the business logic to locate and return a product.
+     * Executes the use case to find a product matching the specified ID.
+     * <p>
+     * Queries the underlying {@link ProductRepository} and ensures an instance is
+     * returned if found, enforcing that missing records terminate abnormally.
      *
      * @param id the {@link UUID} representing the unique identifier of the target
      *           product; must not be {@code null}
      * @return the {@link Product} entity associated with the provided identifier
-     * @throws NotFoundException if no product is found matching the given
-     *                           {@code id}
+     * @throws NotFoundException if no product matches the provided {@code id}
      */
     public Product execute(UUID id) {
         return repository.findById(id)

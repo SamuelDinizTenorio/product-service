@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import com.samuel.productservice.core.repository.ProductRepository;
 import com.samuel.productservice.core.usecase.CreateProductUseCase;
 import com.samuel.productservice.core.usecase.GetProductByIdUseCase;
+import com.samuel.productservice.core.usecase.GetProductBySkuUseCase;
 import com.samuel.productservice.core.usecase.UpdateProductUseCase;
 
 /**
@@ -30,6 +31,19 @@ public class ProductUseCaseConfig {
     @Bean
     public GetProductByIdUseCase getProductByIdUseCase(ProductRepository repository) {
         return new GetProductByIdUseCase(repository);
+    }
+
+    /**
+     * Instantiates the use case for retrieving a product by its unique stock
+     * keeping unit.
+     *
+     * @param repository the {@link ProductRepository} used by the use case to query
+     *                   data; must not be {@code null}
+     * @return an initialized instance of {@link GetProductBySkuUseCase}
+     */
+    @Bean
+    public GetProductBySkuUseCase getProductBySkuUseCase(ProductRepository repository) {
+        return new GetProductBySkuUseCase(repository);
     }
 
     /**

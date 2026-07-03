@@ -72,6 +72,45 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             // Assert
             assertThat(foundProduct).isEmpty();
         }
+
+        @Test
+        @DisplayName("Should retrieve an existing product by its unique SKU code")
+        void shouldFindProductBySku() {
+            // Arrange
+            var product = createDummyProduct("FIND-SKU");
+            var productSku = product.getSku();
+            productRepository.save(product);
+
+            // Flush/Clear to ensure that findById fetches from the actual database rather
+            // than the Hibernate cache.
+            entityManager.flush();
+            entityManager.clear();
+
+            // Act
+            var foundProduct = productRepository.findBySku(productSku);
+
+            // Assert
+            assertThat(foundProduct)
+                    .isPresent()
+                    .hasValueSatisfying(actualProduct -> {
+                        assertThat(actualProduct.getId()).isEqualTo(product.getId());
+                        assertThat(actualProduct.getSku()).isEqualTo(product.getSku());
+                        assertThat(actualProduct.getName()).isEqualTo(product.getName());
+                        assertThat(actualProduct.getStock()).isEqualByComparingTo(product.getStock());
+                        assertThat(actualProduct.getCost()).isEqualByComparingTo(product.getCost());
+                        assertThat(actualProduct.getPrice()).isEqualByComparingTo(product.getPrice());
+                    });
+        }
+
+        @Test
+        @DisplayName("Should return empty optional when product SKU does not exist")
+        void shouldReturnEmptyWhenSkuNotFound() {
+            // Act
+            var foundProduct = productRepository.findBySku("NON-EXISTENT-SKU-999");
+
+            // Assert
+            assertThat(foundProduct).isEmpty();
+        }
     }
 
     @Nested
