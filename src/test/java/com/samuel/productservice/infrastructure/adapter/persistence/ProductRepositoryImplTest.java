@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
 import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductMapper;
+import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductPersistenceMapper;
 import com.samuel.productservice.infrastructure.config.BaseContainersIntegrationTest;
 
 import jakarta.persistence.EntityManager;
 
-@Import({ ProductRepositoryImpl.class, ProductMapper.class })
+@Import({ ProductRepositoryImpl.class, ProductPersistenceMapper.class })
 @DisplayName("ProductRepositoryImpl Integration Tests with Testcontainers")
 class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
 

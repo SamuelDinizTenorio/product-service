@@ -13,9 +13,9 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("ProductMapper Unit Tests")
-class ProductMapperTest {
+class ProductPersistenceMapperTest {
 
-    private final ProductMapper productMapper = new ProductMapper();
+    private final ProductPersistenceMapper productMapper = new ProductPersistenceMapper();
 
     @Nested
     @DisplayName("toNewEntity Mapping Tests")

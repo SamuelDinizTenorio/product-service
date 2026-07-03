@@ -15,7 +15,7 @@ import com.samuel.productservice.infrastructure.adapter.persistence.entity.Produ
  * domain rules and persistence layouts.
  */
 @Component
-public class ProductMapper {
+public class ProductPersistenceMapper {
 
     /**
      * Transforms a core domain {@link Product} model into a new

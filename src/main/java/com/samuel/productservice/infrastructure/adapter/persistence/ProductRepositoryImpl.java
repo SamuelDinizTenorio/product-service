@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.core.repository.ProductRepository;
-import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductMapper;
+import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductPersistenceMapper;
 
 import lombok.AllArgsConstructor;
 
@@ -19,7 +19,7 @@ import lombok.AllArgsConstructor;
  * component acts as a secondary adapter that fulfills the persistence port by
  * orchestrating interactions between a Spring Data JPA database repository
  * ({@link JpaProductRepository}) and a structural mapping layer
- * ({@link ProductMapper}).
+ * ({@link ProductPersistenceMapper}).
  */
 @Component
 @AllArgsConstructor
@@ -34,7 +34,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     /**
      * The utility mapper used to transform structures across layer boundaries.
      */
-    private final ProductMapper mapper;
+    private final ProductPersistenceMapper mapper;
 
     /**
      * Retrieves a product aggregate from the relational database by its unique
