@@ -107,4 +107,22 @@ public class ProductRepositoryImpl implements ProductRepository {
         var savedEntity = repository.save(entity);
         return mapper.toDomain(savedEntity);
     }
+
+    /**
+     * Deletes a product aggregate from the relational database based on its unique
+     * identifier.
+     * <p>
+     * This implementation delegates the deletion request directly to the
+     * underlying {@link JpaProductRepository}, which handles the physical removal
+     * of the corresponding database record. If no product with the specified ID
+     * exists, the operation completes silently without error, consistent with the
+     * repository contract.
+     *
+     * @param id the unique {@link UUID} of the product to delete; must not be
+     *           {@code null}
+     */
+    @Override
+    public void deleteById(UUID id) {
+        repository.deleteById(id);
+    }
 }

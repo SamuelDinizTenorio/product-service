@@ -62,4 +62,16 @@ public interface ProductRepository {
      *         persistence-tier side effects
      */
     Product update(Product product);
+
+    /**
+     * Deletes a product aggregate from the data store based on its unique
+     * identifier.
+     * <p>
+     * If no product with the specified ID exists, the operation completes without
+     * error.
+     *
+     * @param id the unique {@link UUID} of the product to delete; must not be
+     *           {@code null}
+     */
+    void deleteById(UUID id);
 }

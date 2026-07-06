@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.samuel.productservice.core.repository.ProductRepository;
 import com.samuel.productservice.core.usecase.CreateProductUseCase;
+import com.samuel.productservice.core.usecase.DeleteProductUseCase;
 import com.samuel.productservice.core.usecase.GetProductByIdUseCase;
 import com.samuel.productservice.core.usecase.GetProductBySkuUseCase;
 import com.samuel.productservice.core.usecase.UpdateProductUseCase;
@@ -75,5 +76,12 @@ public class ProductUseCaseConfig {
             ProductRepository repository,
             GetProductByIdUseCase getProductByIdUseCase) {
         return new UpdateProductUseCase(repository, getProductByIdUseCase);
+    }
+
+    @Bean
+    public DeleteProductUseCase deleteProductUseCase(
+            ProductRepository repository,
+            GetProductByIdUseCase getProductByIdUseCase) {
+        return new DeleteProductUseCase(getProductByIdUseCase, repository);
     }
 }

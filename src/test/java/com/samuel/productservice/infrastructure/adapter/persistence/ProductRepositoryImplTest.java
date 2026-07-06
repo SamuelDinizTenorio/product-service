@@ -1,6 +1,7 @@
 package com.samuel.productservice.infrastructure.adapter.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -214,5 +215,44 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
                 BigDecimal.ONE,
                 BigDecimal.valueOf(100),
                 BigDecimal.valueOf(200));
+    }
+
+    @Nested
+    @DisplayName("Deleting Products")
+    class DeleteOperations {
+
+        @Test
+        @DisplayName("Should physically remove an existing product from the database")
+        void shouldDeleteExistingProduct() {
+            // Arrange - Creates and persists the product in the container's database.
+            var product = createDummyProduct("DELETE");
+            var productId = product.getId();
+            productRepository.save(product);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            // Act
+            productRepository.deleteById(productId);
+
+            // Synchronizes the persistence context to ensure the deletion has been
+            // committed to the physical database.
+            entityManager.flush();
+            entityManager.clear();
+
+            // Assert
+            var deletedProductInDatabase = jpaProductRepository.findById(productId);
+            assertThat(deletedProductInDatabase).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Should execute safely without throwing exceptions when the product ID does not exist")
+        void shouldHandleDeletionSafelyWhenIdDoesNotExist() {
+            // Arrange
+            var nonExistentId = UUID.randomUUID();
+
+            // Act & Assert
+            assertDoesNotThrow(() -> productRepository.deleteById(nonExistentId));
+        }
     }
 }

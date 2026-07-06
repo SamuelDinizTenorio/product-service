@@ -1,6 +1,7 @@
 package com.samuel.productservice.infrastructure.config;
 
 import com.samuel.productservice.core.usecase.CreateProductUseCase;
+import com.samuel.productservice.core.usecase.DeleteProductUseCase;
 import com.samuel.productservice.core.usecase.GetProductByIdUseCase;
 import com.samuel.productservice.core.usecase.GetProductBySkuUseCase;
 import com.samuel.productservice.core.usecase.UpdateProductUseCase;
@@ -26,5 +27,6 @@ class ProductUseCaseConfigTest extends BaseIntegrationTest {
         assertThat(context.getBean(GetProductBySkuUseCase.class)).isNotNull();
         assertThat(context.getBean(CreateProductUseCase.class)).isNotNull();
         assertThat(context.getBean(UpdateProductUseCase.class)).isNotNull();
+        assertThat(context.getBean(DeleteProductUseCase.class)).isNotNull();
     }
 }
