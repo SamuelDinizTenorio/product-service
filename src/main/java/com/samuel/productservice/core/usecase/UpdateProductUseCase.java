@@ -42,6 +42,7 @@ public class UpdateProductUseCase {
      *                    to apply to the existing record
      * @return the updated {@link Product} entity after persistent storage
      *         synchronization
+     * @throws NotFoundException if no product matches the provided {@code id}
      */
     public Product execute(UUID id, Product productData) {
         var existingProduct = getProductByIdUseCase.execute(id);

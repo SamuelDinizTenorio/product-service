@@ -11,9 +11,8 @@ import lombok.AllArgsConstructor;
  * keeping unit (SKU).
  * <p>
  * This class coordinates the domain logic to ensure that a product exists for
- * the requested
- * identifier, establishing a bridge between the application entry points and
- * the underlying persistence layer.
+ * the requested business code, establishing a bridge between the application
+ * entry points and the underlying persistence layer.
  */
 @AllArgsConstructor
 public class GetProductBySkuUseCase {
@@ -27,8 +26,7 @@ public class GetProductBySkuUseCase {
      * Executes the use case to find a product matching the specified SKU.
      * <p>
      * Queries the underlying {@link ProductRepository} and ensures an instance is
-     * returned
-     * if found, enforcing that missing records terminate abnormally.
+     * returned if found, enforcing that missing records terminate abnormally.
      *
      * @param sku the unique stock keeping unit identifier, must not be {@code null}
      *            or empty

@@ -12,10 +12,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("ProductMapper Unit Tests")
+@DisplayName("ProductPersistenceMapper Unit Tests")
 class ProductPersistenceMapperTest {
 
-    private final ProductPersistenceMapper productMapper = new ProductPersistenceMapper();
+    private final ProductPersistenceMapper mapper = new ProductPersistenceMapper();
 
     @Nested
     @DisplayName("toNewEntity Mapping Tests")
@@ -33,16 +33,16 @@ class ProductPersistenceMapperTest {
                     BigDecimal.valueOf(299.90));
 
             // Act
-            final var entity = productMapper.toNewEntity(product);
+            final var entity = mapper.toNewEntity(product);
 
             // Assert
-            assertThat(entity).isNotNull();
-            assertThat(entity.getId()).isEqualTo(product.getId());
-            assertThat(entity.getSku()).isEqualTo(product.getSku());
-            assertThat(entity.getName()).isEqualTo(product.getName());
-            assertThat(entity.getStock()).isEqualTo(product.getStock());
-            assertThat(entity.getCost()).isEqualTo(product.getCost());
-            assertThat(entity.getPrice()).isEqualTo(product.getPrice());
+            assertThat(entity)
+                    .isNotNull()
+                    .usingRecursiveComparison()
+                    .ignoringFields("isNew") // isNew does not exist in the Domain, so we ignore it.
+                    .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
+                    .isEqualTo(product);
+
             assertThat(entity.isNew()).isTrue();
         }
 
@@ -50,7 +50,7 @@ class ProductPersistenceMapperTest {
         @DisplayName("Should return null when source product is null")
         void shouldReturnNullWhenProductIsNull() {
             // Act
-            final var entity = productMapper.toNewEntity(null);
+            final var entity = mapper.toNewEntity(null);
 
             // Assert
             assertThat(entity).isNull();
@@ -75,16 +75,16 @@ class ProductPersistenceMapperTest {
                     BigDecimal.valueOf(299.90));
 
             // Act
-            final var entity = productMapper.toUpdateEntity(product);
+            final var entity = mapper.toUpdateEntity(product);
 
             // Assert
-            assertThat(entity).isNotNull();
-            assertThat(entity.getId()).isEqualTo(product.getId());
-            assertThat(entity.getSku()).isEqualTo(product.getSku());
-            assertThat(entity.getName()).isEqualTo(product.getName());
-            assertThat(entity.getStock()).isEqualTo(product.getStock());
-            assertThat(entity.getCost()).isEqualTo(product.getCost());
-            assertThat(entity.getPrice()).isEqualTo(product.getPrice());
+            assertThat(entity)
+                    .isNotNull()
+                    .usingRecursiveComparison()
+                    .ignoringFields("isNew") // isNew does not exist in the Domain, so we ignore it.
+                    .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
+                    .isEqualTo(product);
+
             assertThat(entity.isNew()).isFalse();
         }
 
@@ -92,7 +92,7 @@ class ProductPersistenceMapperTest {
         @DisplayName("Should return null when source product is null")
         void shouldReturnNullWhenProductIsNull() {
             // Act
-            final var entity = productMapper.toUpdateEntity(null);
+            final var entity = mapper.toUpdateEntity(null);
 
             // Assert
             assertThat(entity).isNull();
@@ -118,23 +118,21 @@ class ProductPersistenceMapperTest {
                     false);
 
             // Act
-            final var product = productMapper.toDomain(entity);
+            final var product = mapper.toDomain(entity);
 
             // Assert
-            assertThat(product).isNotNull();
-            assertThat(product.getId()).isEqualTo(entity.getId());
-            assertThat(product.getSku()).isEqualTo(entity.getSku());
-            assertThat(product.getName()).isEqualTo(entity.getName());
-            assertThat(product.getStock()).isEqualTo(entity.getStock());
-            assertThat(product.getCost()).isEqualTo(entity.getCost());
-            assertThat(product.getPrice()).isEqualTo(entity.getPrice());
+            assertThat(product)
+                    .isNotNull()
+                    .usingRecursiveComparison()
+                    .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
+                    .isEqualTo(entity);
         }
 
         @Test
         @DisplayName("Should return null when source entity is null")
         void shouldReturnNullWhenEntityIsNull() {
             // Act
-            final var product = productMapper.toDomain(null);
+            final var product = mapper.toDomain(null);
 
             // Assert
             assertThat(product).isNull();

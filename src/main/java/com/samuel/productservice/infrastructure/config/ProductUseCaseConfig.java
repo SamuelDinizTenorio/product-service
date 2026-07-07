@@ -78,6 +78,16 @@ public class ProductUseCaseConfig {
         return new UpdateProductUseCase(repository, getProductByIdUseCase);
     }
 
+    /**
+     * Instantiates the use case responsible for handling product deletion logic.
+     *
+     * @param repository            the {@link ProductRepository} used by the use
+     *                              case to execute the deletion
+     * @param getProductByIdUseCase the {@link GetProductByIdUseCase} dependency
+     *                              required to verify the product's existence
+     *                              before attempting to delete it
+     * @return an initialized instance of {@link DeleteProductUseCase}
+     */
     @Bean
     public DeleteProductUseCase deleteProductUseCase(
             ProductRepository repository,
