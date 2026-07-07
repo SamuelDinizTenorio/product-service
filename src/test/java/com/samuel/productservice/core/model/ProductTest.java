@@ -48,6 +48,54 @@ class ProductTest {
         }
 
         @Nested
+        @DisplayName("Product Equality Tests (Equals and HashCode)")
+        class EqualsAndHashCodeTest {
+
+                @Test
+                @DisplayName("Should be equal when products have the same ID, even with different attributes")
+                void shouldBeEqualWhenSameId() {
+                        // Arrange
+                        final var id = UUID.randomUUID();
+                        final var productA = Product.reconstitute(
+                                        id,
+                                        "SKU-1",
+                                        "Mouse",
+                                        BigDecimal.TEN,
+                                        BigDecimal.TEN,
+                                        BigDecimal.valueOf(20));
+                        final var productB = Product.reconstitute(
+                                        id,
+                                        "SKU-2",
+                                        "Keyboard",
+                                        BigDecimal.ONE,
+                                        BigDecimal.ONE,
+                                        BigDecimal.valueOf(5));
+
+                        // Act & Assert
+                        assertThat(productA).isEqualTo(productB);
+                        assertThat(productA.hashCode()).isEqualTo(productB.hashCode());
+                }
+
+                @Test
+                @DisplayName("Should not be equal when products have different IDs, even with identical attributes")
+                void shouldNotBeEqualWhenDifferentId() {
+                        // Arrange
+                        final var sku = "SKU-123";
+                        final var name = "Mouse";
+                        final var stock = BigDecimal.TEN;
+                        final var cost = BigDecimal.TEN;
+                        final var price = BigDecimal.valueOf(20);
+
+                        final var productA = Product.reconstitute(UUID.randomUUID(), sku, name, stock, cost, price);
+                        final var productB = Product.reconstitute(UUID.randomUUID(), sku, name, stock, cost, price);
+
+                        // Act & Assert
+                        assertThat(productA).isNotEqualTo(productB);
+                        assertThat(productA.hashCode()).isNotEqualTo(productB.hashCode());
+                }
+        }
+
+        @Nested
         @DisplayName("Product Creation Tests")
         class Create {
 
@@ -62,7 +110,11 @@ class ProductTest {
                         final var expectedPrice = BigDecimal.valueOf(30);
 
                         // Act
-                        final var product = Product.create(expectedSku, expectedName, expectedStock, expectedCost,
+                        final var product = Product.create(
+                                        expectedSku,
+                                        expectedName,
+                                        expectedStock,
+                                        expectedCost,
                                         expectedPrice);
 
                         // Assert
@@ -134,8 +186,13 @@ class ProductTest {
                         final var expectedPrice = BigDecimal.valueOf(25.99);
 
                         // Act
-                        final var product = Product.reconstitute(expectedId, expectedSku, expectedName, expectedStock,
-                                        expectedCost, expectedPrice);
+                        final var product = Product.reconstitute(
+                                        expectedId,
+                                        expectedSku,
+                                        expectedName,
+                                        expectedStock,
+                                        expectedCost,
+                                        expectedPrice);
 
                         // Assert
                         assertThat(product).isNotNull();
@@ -231,7 +288,12 @@ class ProductTest {
                         final var expectedId = product.getId();
 
                         // Act
-                        product.update(expectedSku, expectedName, expectedStock, expectedCost, expectedPrice);
+                        product.update(
+                                        expectedSku,
+                                        expectedName,
+                                        expectedStock,
+                                        expectedCost,
+                                        expectedPrice);
 
                         // Assert
                         assertThat(product.getId()).isEqualTo(expectedId);
@@ -248,8 +310,12 @@ class ProductTest {
                 void shouldInstanceNewProductAndNotUpdate(String sku, String name, BigDecimal stock, BigDecimal cost,
                                 BigDecimal price, String expectedMessage) {
                         // Arrange
-                        final var product = Product.create("2", "original name", BigDecimal.valueOf(100),
-                                        BigDecimal.valueOf(200), BigDecimal.valueOf(300));
+                        final var product = Product.create(
+                                        "2",
+                                        "original name",
+                                        BigDecimal.valueOf(100),
+                                        BigDecimal.valueOf(200),
+                                        BigDecimal.valueOf(300));
 
                         // Act & Assert
                         assertThatThrownBy(() -> product.update(sku, name, stock, cost, price))
@@ -265,8 +331,12 @@ class ProductTest {
                 @DisplayName("Should collect multiple errors on update")
                 void shouldCollectMultipleErrorsOnUpdate() {
                         // Arrange
-                        final var product = Product.create("2", "original name", BigDecimal.valueOf(100),
-                                        BigDecimal.valueOf(200), BigDecimal.valueOf(300));
+                        final var product = Product.create(
+                                        "2",
+                                        "original name",
+                                        BigDecimal.valueOf(100),
+                                        BigDecimal.valueOf(200),
+                                        BigDecimal.valueOf(300));
 
                         final String invalidSku = "";
                         final String invalidName = null;

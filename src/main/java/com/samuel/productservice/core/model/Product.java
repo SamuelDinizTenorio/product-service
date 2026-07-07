@@ -8,6 +8,7 @@ import com.samuel.productservice.core.exception.NotificationException;
 import com.samuel.productservice.core.validation.NotificationError;
 import com.samuel.productservice.core.validation.NotificationValidation;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -16,13 +17,20 @@ import lombok.Getter;
  * This entity enforces core domain invariants such as mandatory attributes,
  * string length thresholds, and transactional consistency between cost and
  * price.
+ * <p>
+ * <strong>Note on Equality:</strong> In accordance with Domain-Driven Design
+ * (DDD) principles, equality and identity ({@code equals} and {@code hashCode})
+ * are governed strictly by the product's unique identifier ({@code id}),
+ * regardless of state mutations.
  */
 @Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Product {
 
     /**
      * The unique identifier of the product.
      */
+    @EqualsAndHashCode.Include
     private UUID id;
 
     /**
