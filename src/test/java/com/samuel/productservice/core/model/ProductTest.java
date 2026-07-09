@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.samuel.productservice.core.exception.NotificationException;
+import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.core.validation.NotificationError;
 
 @DisplayName("Product Domain Entity Tests")
@@ -63,13 +64,7 @@ class ProductTest {
                                         BigDecimal.TEN,
                                         BigDecimal.TEN,
                                         BigDecimal.valueOf(20));
-                        final var productB = Product.reconstitute(
-                                        id,
-                                        "SKU-2",
-                                        "Keyboard",
-                                        BigDecimal.ONE,
-                                        BigDecimal.ONE,
-                                        BigDecimal.valueOf(5));
+                        final var productB = ProductFixture.reconstituteWithId(id);
 
                         // Act & Assert
                         assertThat(productA).isEqualTo(productB);
@@ -80,14 +75,8 @@ class ProductTest {
                 @DisplayName("Should not be equal when products have different IDs, even with identical attributes")
                 void shouldNotBeEqualWhenDifferentId() {
                         // Arrange
-                        final var sku = "SKU-123";
-                        final var name = "Mouse";
-                        final var stock = BigDecimal.TEN;
-                        final var cost = BigDecimal.TEN;
-                        final var price = BigDecimal.valueOf(20);
-
-                        final var productA = Product.reconstitute(UUID.randomUUID(), sku, name, stock, cost, price);
-                        final var productB = Product.reconstitute(UUID.randomUUID(), sku, name, stock, cost, price);
+                        final var productA = ProductFixture.any();
+                        final var productB = ProductFixture.any();
 
                         // Act & Assert
                         assertThat(productA).isNotEqualTo(productB);
@@ -283,8 +272,7 @@ class ProductTest {
                         final var expectedCost = BigDecimal.valueOf(20);
                         final var expectedPrice = BigDecimal.valueOf(30);
 
-                        final var product = Product.create("2", "original name", BigDecimal.valueOf(100),
-                                        BigDecimal.valueOf(200), BigDecimal.valueOf(300));
+                        final var product = ProductFixture.any();
                         final var expectedId = product.getId();
 
                         // Act
@@ -310,12 +298,7 @@ class ProductTest {
                 void shouldInstanceNewProductAndNotUpdate(String sku, String name, BigDecimal stock, BigDecimal cost,
                                 BigDecimal price, String expectedMessage) {
                         // Arrange
-                        final var product = Product.create(
-                                        "2",
-                                        "original name",
-                                        BigDecimal.valueOf(100),
-                                        BigDecimal.valueOf(200),
-                                        BigDecimal.valueOf(300));
+                        final var product = ProductFixture.any();
 
                         // Act & Assert
                         assertThatThrownBy(() -> product.update(sku, name, stock, cost, price))
@@ -331,12 +314,7 @@ class ProductTest {
                 @DisplayName("Should collect multiple errors on update")
                 void shouldCollectMultipleErrorsOnUpdate() {
                         // Arrange
-                        final var product = Product.create(
-                                        "2",
-                                        "original name",
-                                        BigDecimal.valueOf(100),
-                                        BigDecimal.valueOf(200),
-                                        BigDecimal.valueOf(300));
+                        final var product = ProductFixture.any();
 
                         final String invalidSku = "";
                         final String invalidName = null;

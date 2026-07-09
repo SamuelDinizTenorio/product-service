@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import com.samuel.productservice.core.exception.NotFoundException;
+import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.core.repository.ProductRepository;
 
@@ -24,54 +25,49 @@ import static org.mockito.Mockito.verify;
 @DisplayName("GetProductBySkuUseCase Unit Tests")
 class GetProductBySkuUseCaseTest {
 
-    @Mock
-    private ProductRepository repository;
+        @Mock
+        private ProductRepository repository;
 
-    @InjectMocks
-    private GetProductBySkuUseCase getProductBySkuUseCase;
+        @InjectMocks
+        private GetProductBySkuUseCase getProductBySkuUseCase;
 
-    @Nested
-    @DisplayName("Execute Method Scenarios")
-    class ExecuteMethod {
+        @Nested
+        @DisplayName("Execute Method Scenarios")
+        class ExecuteMethod {
 
-        @Test
-        @DisplayName("Should successfully return the product when it exists in the repository")
-        void shouldReturnProductWhenProductExists() {
-            // Arrange
-            final var expectedProduct = Product.create(
-                    "SKU-123",
-                    "Teclado Mecânico",
-                    BigDecimal.valueOf(10),
-                    BigDecimal.valueOf(150.00),
-                    BigDecimal.valueOf(299.90));
-            final var productSku = expectedProduct.getSku();
+                @Test
+                @DisplayName("Should successfully return the product when it exists in the repository")
+                void shouldReturnProductWhenProductExists() {
+                        // Arrange
+                        final var expectedProduct = ProductFixture.any();
+                        final var productSku = expectedProduct.getSku();
 
-            given(repository.findBySku(productSku))
-                    .willReturn(Optional.of(expectedProduct));
+                        given(repository.findBySku(productSku))
+                                        .willReturn(Optional.of(expectedProduct));
 
-            // Act
-            Product actualProduct = getProductBySkuUseCase.execute(productSku);
+                        // Act
+                        Product actualProduct = getProductBySkuUseCase.execute(productSku);
 
-            // Assert
-            assertThat(actualProduct)
-                    .isNotNull()
-                    .isSameAs(expectedProduct);
-            verify(repository).findBySku(productSku);
+                        // Assert
+                        assertThat(actualProduct)
+                                        .isNotNull()
+                                        .isSameAs(expectedProduct);
+                        verify(repository).findBySku(productSku);
+                }
+
+                @Test
+                @DisplayName("Should throw NotFoundException when the product does not exist in the repository")
+                void shouldThrowNotFoundExceptionWhenProductDoesNotExist() {
+                        // Arrange
+                        final var productSku = "SKU-NON-EXISTENT";
+                        given(repository.findBySku(productSku))
+                                        .willReturn(Optional.empty());
+
+                        // Act & Assert
+                        assertThatThrownBy(() -> getProductBySkuUseCase.execute(productSku))
+                                        .isInstanceOf(NotFoundException.class)
+                                        .hasMessageContaining(productSku);
+                        verify(repository).findBySku(productSku);
+                }
         }
-
-        @Test
-        @DisplayName("Should throw NotFoundException when the product does not exist in the repository")
-        void shouldThrowNotFoundExceptionWhenProductDoesNotExist() {
-            // Arrange
-            final var productSku = "SKU-NON-EXISTENT";
-            given(repository.findBySku(productSku))
-                    .willReturn(Optional.empty());
-
-            // Act & Assert
-            assertThatThrownBy(() -> getProductBySkuUseCase.execute(productSku))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining(productSku);
-            verify(repository).findBySku(productSku);
-        }
-    }
 }

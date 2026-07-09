@@ -4,6 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.samuel.productservice.infrastructure.adapter.persistence.fixture.ProductEntityFixture;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -25,20 +27,13 @@ class ProductEntityTest {
             final var entityA = ProductEntity.create(
                     commonId,
                     "SKU-1",
-                    "Original Keyboard",
+                    "Keyboard",
                     BigDecimal.TEN,
                     BigDecimal.TEN,
                     BigDecimal.TEN,
                     true);
 
-            final var entityB = ProductEntity.create(
-                    commonId,
-                    "SKU-2",
-                    "Modified Keyboard",
-                    BigDecimal.ZERO,
-                    BigDecimal.ONE,
-                    BigDecimal.ONE,
-                    false);
+            final var entityB = ProductEntityFixture.createWithIdAndIsNew(commonId, false);
 
             // Act & Assert
             assertThat(entityA).isEqualTo(entityB);
@@ -49,14 +44,8 @@ class ProductEntityTest {
         @DisplayName("Should not be equal when entities have different IDs, even with identical attributes")
         void shouldNotBeEqualWhenDifferentId() {
             // Arrange
-            final var sku = "SKU-123";
-            final var name = "Keyboard";
-            final var stock = BigDecimal.TEN;
-            final var cost = BigDecimal.valueOf(150.00);
-            final var price = BigDecimal.valueOf(299.90);
-
-            final var entityA = ProductEntity.create(UUID.randomUUID(), sku, name, stock, cost, price, true);
-            final var entityB = ProductEntity.create(UUID.randomUUID(), sku, name, stock, cost, price, true);
+            final var entityA = ProductEntityFixture.any();
+            final var entityB = ProductEntityFixture.any();
 
             // Act & Assert
             assertThat(entityA).isNotEqualTo(entityB);
@@ -67,14 +56,7 @@ class ProductEntityTest {
         @DisplayName("Should handle comparison with null and different object types safely")
         void shouldHandleNullAndDifferentTypes() {
             // Arrange
-            final var entity = ProductEntity.create(
-                    UUID.randomUUID(),
-                    "SKU-123",
-                    "Keyboard",
-                    BigDecimal.TEN,
-                    BigDecimal.TEN,
-                    BigDecimal.TEN,
-                    true);
+            final var entity = ProductEntityFixture.any();
 
             // Act & Assert
             assertThat(entity).isNotEqualTo(null);

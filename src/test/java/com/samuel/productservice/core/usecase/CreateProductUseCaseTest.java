@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.samuel.productservice.core.exception.ConflictException;
+import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.core.repository.ProductRepository;
 
@@ -26,67 +27,57 @@ import static org.mockito.Mockito.verify;
 @DisplayName("CreateProductUseCase Unit Tests")
 class CreateProductUseCaseTest {
 
-    @Mock
-    private ProductRepository repository;
+        @Mock
+        private ProductRepository repository;
 
-    @InjectMocks
-    private CreateProductUseCase createProductUseCase;
+        @InjectMocks
+        private CreateProductUseCase createProductUseCase;
 
-    @Nested
-    @DisplayName("Execute Method Scenarios")
-    class ExecuteMethod {
+        @Nested
+        @DisplayName("Execute Method Scenarios")
+        class ExecuteMethod {
 
-        @Test
-        @DisplayName("Should successfully create and return a new product")
-        void shouldCreateAndReturnNewProduct() {
-            // Arrange
-            final var newProduct = Product.create(
-                    "SKU-123",
-                    "Teclado Mecânico",
-                    BigDecimal.valueOf(10),
-                    BigDecimal.valueOf(150.00),
-                    BigDecimal.valueOf(299.90));
-            final var productSku = newProduct.getSku();
+                @Test
+                @DisplayName("Should successfully create and return a new product")
+                void shouldCreateAndReturnNewProduct() {
+                        // Arrange
+                        final var newProduct = ProductFixture.any();
+                        final var productSku = newProduct.getSku();
 
-            given(repository.findBySku(productSku))
-                    .willReturn(Optional.empty());
-            given(repository.save(newProduct))
-                    .willReturn(newProduct);
+                        given(repository.findBySku(productSku))
+                                        .willReturn(Optional.empty());
+                        given(repository.save(newProduct))
+                                        .willReturn(newProduct);
 
-            // Act
-            Product createdProduct = createProductUseCase.execute(newProduct);
+                        // Act
+                        Product createdProduct = createProductUseCase.execute(newProduct);
 
-            // Assert
-            assertThat(createdProduct)
-                    .isNotNull()
-                    .isSameAs(newProduct);
+                        // Assert
+                        assertThat(createdProduct)
+                                        .isNotNull()
+                                        .isSameAs(newProduct);
 
-            verify(repository).findBySku(productSku);
-            verify(repository).save(newProduct);
+                        verify(repository).findBySku(productSku);
+                        verify(repository).save(newProduct);
+                }
+
+                @Test
+                @DisplayName("Should throw ConflictException when product SKU already exists")
+                void shouldThrowConflictExceptionWhenSkuExists() {
+                        // Arrange
+                        final var newProduct = ProductFixture.any();
+                        final var productSku = newProduct.getSku();
+
+                        given(repository.findBySku(productSku))
+                                        .willReturn(Optional.of(newProduct));
+
+                        // Act & Assert
+                        assertThatThrownBy(() -> createProductUseCase.execute(newProduct))
+                                        .isInstanceOf(ConflictException.class)
+                                        .hasMessageContaining(productSku);
+
+                        verify(repository).findBySku(productSku);
+                        verify(repository, never()).save(any());
+                }
         }
-
-        @Test
-        @DisplayName("Should throw ConflictException when product SKU already exists")
-        void shouldThrowConflictExceptionWhenSkuExists() {
-            // Arrange
-            final var newProduct = Product.create(
-                    "SKU-123",
-                    "Teclado Mecânico",
-                    BigDecimal.valueOf(10),
-                    BigDecimal.valueOf(150.00),
-                    BigDecimal.valueOf(299.90));
-            final var productSku = newProduct.getSku();
-
-            given(repository.findBySku(productSku))
-                    .willReturn(Optional.of(newProduct));
-
-            // Act & Assert
-            assertThatThrownBy(() -> createProductUseCase.execute(newProduct))
-                    .isInstanceOf(ConflictException.class)
-                    .hasMessageContaining(productSku);
-
-            verify(repository).findBySku(productSku);
-            verify(repository, never()).save(any());
-        }
-    }
 }

@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.samuel.productservice.core.exception.NotFoundException;
+import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.core.repository.ProductRepository;
 
@@ -39,12 +40,7 @@ class GetProductByIdUseCaseTest {
                 @DisplayName("Should successfully return the product when it exists in the repository")
                 void shouldReturnProductWhenProductExists() {
                         // Arrange
-                        final var expectedProduct = Product.create(
-                                        "SKU-123",
-                                        "Teclado Mecânico",
-                                        BigDecimal.valueOf(10),
-                                        BigDecimal.valueOf(150.00),
-                                        BigDecimal.valueOf(299.90));
+                        final var expectedProduct = ProductFixture.any();
                         final var productId = expectedProduct.getId();
 
                         given(repository.findById(productId))

@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.core.repository.ProductRepository;
 
@@ -21,59 +22,54 @@ import static org.mockito.Mockito.verify;
 @DisplayName("UpdateProductUseCase Unit Tests")
 class UpdateProductUseCaseTest {
 
-    @Mock
-    private ProductRepository repository;
+        @Mock
+        private ProductRepository repository;
 
-    @Mock
-    private GetProductByIdUseCase getProductByIdUseCase;
+        @Mock
+        private GetProductByIdUseCase getProductByIdUseCase;
 
-    @InjectMocks
-    private UpdateProductUseCase updateProductUseCase;
+        @InjectMocks
+        private UpdateProductUseCase updateProductUseCase;
 
-    @Nested
-    @DisplayName("Execute Method Scenarios")
-    class ExecuteMethod {
+        @Nested
+        @DisplayName("Execute Method Scenarios")
+        class ExecuteMethod {
 
-        @Test
-        @DisplayName("Should successfully update and return an existing product")
-        void shouldUpdateAndReturnExistingProduct() {
-            // Arrange
-            final var existingProduct = Product.create(
-                    "SKU-123",
-                    "Teclado Mecânico",
-                    BigDecimal.valueOf(10),
-                    BigDecimal.valueOf(150.00),
-                    BigDecimal.valueOf(299.90));
-            final var productId = existingProduct.getId();
+                @Test
+                @DisplayName("Should successfully update and return an existing product")
+                void shouldUpdateAndReturnExistingProduct() {
+                        // Arrange
+                        final var existingProduct = ProductFixture.any();
+                        final var productId = existingProduct.getId();
 
-            final var updatedProductData = Product.create(
-                    "SKU-456",
-                    "Mouse Gamer",
-                    BigDecimal.valueOf(20),
-                    BigDecimal.valueOf(50.00),
-                    BigDecimal.valueOf(99.90));
+                        final var updatedProductData = Product.create(
+                                        "SKU-456",
+                                        "Keyboard",
+                                        BigDecimal.valueOf(20),
+                                        BigDecimal.valueOf(50.00),
+                                        BigDecimal.valueOf(99.90));
 
-            given(getProductByIdUseCase.execute(productId))
-                    .willReturn(existingProduct);
-            given(repository.update(existingProduct))
-                    .willReturn(existingProduct);
+                        given(getProductByIdUseCase.execute(productId))
+                                        .willReturn(existingProduct);
+                        given(repository.update(existingProduct))
+                                        .willReturn(existingProduct);
 
-            // Act
-            Product actualProduct = updateProductUseCase.execute(productId, updatedProductData);
+                        // Act
+                        Product actualProduct = updateProductUseCase.execute(productId, updatedProductData);
 
-            // Assert
-            assertThat(actualProduct)
-                    .isNotNull()
-                    .isSameAs(existingProduct);
-            assertThat(actualProduct.getSku()).isEqualTo(updatedProductData.getSku());
-            assertThat(actualProduct.getName()).isEqualTo(updatedProductData.getName());
-            assertThat(actualProduct.getStock()).isEqualByComparingTo(updatedProductData.getStock());
-            assertThat(actualProduct.getCost()).isEqualByComparingTo(updatedProductData.getCost());
-            assertThat(actualProduct.getPrice()).isEqualByComparingTo(updatedProductData.getPrice());
+                        // Assert
+                        assertThat(actualProduct)
+                                        .isNotNull()
+                                        .isSameAs(existingProduct);
+                        assertThat(actualProduct.getSku()).isEqualTo(updatedProductData.getSku());
+                        assertThat(actualProduct.getName()).isEqualTo(updatedProductData.getName());
+                        assertThat(actualProduct.getStock()).isEqualByComparingTo(updatedProductData.getStock());
+                        assertThat(actualProduct.getCost()).isEqualByComparingTo(updatedProductData.getCost());
+                        assertThat(actualProduct.getPrice()).isEqualByComparingTo(updatedProductData.getPrice());
 
-            verify(getProductByIdUseCase).execute(productId);
-            verify(repository).update(existingProduct);
+                        verify(getProductByIdUseCase).execute(productId);
+                        verify(repository).update(existingProduct);
+                }
+
         }
-
-    }
 }

@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.samuel.productservice.core.exception.NotFoundException;
+import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.core.repository.ProductRepository;
 
@@ -41,13 +42,8 @@ class DeleteProductUseCaseTest {
         @DisplayName("Should successfully delete the product when it exists")
         void shouldDeleteProductWhenIdExists() {
             // Arrange
-            final var productId = UUID.randomUUID();
-            final var existingProduct = Product.create(
-                    "SKU-123",
-                    "Teclado",
-                    BigDecimal.TEN,
-                    BigDecimal.ONE,
-                    BigDecimal.TEN);
+            final var existingProduct = ProductFixture.any();
+            final var productId = existingProduct.getId();
 
             given(getProductByIdUseCase.execute(productId))
                     .willReturn(existingProduct);

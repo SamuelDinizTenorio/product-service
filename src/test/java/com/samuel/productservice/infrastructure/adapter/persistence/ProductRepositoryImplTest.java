@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
-import com.samuel.productservice.core.model.Product;
+import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductPersistenceMapper;
 import com.samuel.productservice.infrastructure.config.BaseContainersIntegrationTest;
 
@@ -39,7 +39,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         @DisplayName("Should retrieve an existing product by its unique identifier")
         void shouldFindProductById() {
             // Arrange
-            var product = createDummyProduct("FIND");
+            var product = ProductFixture.withSku("REPO-FIND-ID");
             var productId = product.getId();
             productRepository.save(product);
 
@@ -78,7 +78,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         @DisplayName("Should retrieve an existing product by its unique SKU code")
         void shouldFindProductBySku() {
             // Arrange
-            var product = createDummyProduct("FIND-SKU");
+            var product = ProductFixture.withSku("REPO-FIND-SKU");
             var productSku = product.getSku();
             productRepository.save(product);
 
@@ -122,7 +122,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         @DisplayName("Should persist a new product successfully and handle isNew lifecycle properly")
         void shouldPersistNewProduct() {
             // Arrange
-            var product = createDummyProduct("SAVE");
+            var product = ProductFixture.withSku("REPO-SAVE");
             var productId = product.getId();
 
             // Act
@@ -162,7 +162,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         void shouldUpdateExistingProduct() {
             // Arrange
             // Creates and persists the original product in the database.
-            var originalProduct = createDummyProduct("UPDATE");
+            var originalProduct = ProductFixture.withSku("REPO-UPDATE");
             var productId = originalProduct.getId();
             productRepository.save(originalProduct);
 
@@ -208,15 +208,6 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         }
     }
 
-    private Product createDummyProduct(String suffix) {
-        return Product.create(
-                "SKU-TEST-" + suffix,
-                "Product Test " + suffix,
-                BigDecimal.ONE,
-                BigDecimal.valueOf(100),
-                BigDecimal.valueOf(200));
-    }
-
     @Nested
     @DisplayName("Deleting Products")
     class DeleteOperations {
@@ -225,7 +216,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         @DisplayName("Should physically remove an existing product from the database")
         void shouldDeleteExistingProduct() {
             // Arrange - Creates and persists the product in the container's database.
-            var product = createDummyProduct("DELETE");
+            var product = ProductFixture.withSku("REPO-DELETE");
             var productId = product.getId();
             productRepository.save(product);
 

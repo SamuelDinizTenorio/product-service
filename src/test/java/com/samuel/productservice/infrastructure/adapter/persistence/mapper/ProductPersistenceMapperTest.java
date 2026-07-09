@@ -1,7 +1,7 @@
 package com.samuel.productservice.infrastructure.adapter.persistence.mapper;
 
-import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.infrastructure.adapter.persistence.entity.ProductEntity;
+import com.samuel.productservice.core.fixture.ProductFixture;
+import com.samuel.productservice.infrastructure.adapter.persistence.fixture.ProductEntityFixture;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -25,12 +25,7 @@ class ProductPersistenceMapperTest {
         @DisplayName("Should map domain Product to ProductEntity flagged as isNew=true")
         void shouldMapToNewEntity() {
             // Arrange
-            final var product = Product.create(
-                    "SKU-123",
-                    "Teclado Mecânico",
-                    BigDecimal.valueOf(10),
-                    BigDecimal.valueOf(150.00),
-                    BigDecimal.valueOf(299.90));
+            final var product = ProductFixture.any();
 
             // Act
             final var entity = mapper.toNewEntity(product);
@@ -66,13 +61,7 @@ class ProductPersistenceMapperTest {
         void shouldMapToUpdateEntity() {
             // Arrange
             final var existingId = UUID.randomUUID();
-            final var product = Product.reconstitute(
-                    existingId,
-                    "SKU-123",
-                    "Teclado Mecânico",
-                    BigDecimal.valueOf(10),
-                    BigDecimal.valueOf(150.00),
-                    BigDecimal.valueOf(299.90));
+            final var product = ProductFixture.reconstituteWithId(existingId);
 
             // Act
             final var entity = mapper.toUpdateEntity(product);
@@ -108,14 +97,7 @@ class ProductPersistenceMapperTest {
         void shouldMapToDomain() {
             // Arrange
             final var expectedId = UUID.randomUUID();
-            final var entity = ProductEntity.create(
-                    expectedId,
-                    "SKU-123",
-                    "Teclado Mecânico",
-                    BigDecimal.valueOf(10),
-                    BigDecimal.valueOf(150.00),
-                    BigDecimal.valueOf(299.90),
-                    false);
+            final var entity = ProductEntityFixture.createWithId(expectedId);
 
             // Act
             final var product = mapper.toDomain(entity);
