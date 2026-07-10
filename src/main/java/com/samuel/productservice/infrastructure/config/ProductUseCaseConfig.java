@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import com.samuel.productservice.core.repository.ProductRepository;
 import com.samuel.productservice.core.usecase.CreateProductUseCase;
 import com.samuel.productservice.core.usecase.DeleteProductUseCase;
+import com.samuel.productservice.core.usecase.FindAllProductUseCase;
 import com.samuel.productservice.core.usecase.GetProductByIdUseCase;
 import com.samuel.productservice.core.usecase.GetProductBySkuUseCase;
 import com.samuel.productservice.core.usecase.UpdateProductUseCase;
@@ -93,5 +94,18 @@ public class ProductUseCaseConfig {
             ProductRepository repository,
             GetProductByIdUseCase getProductByIdUseCase) {
         return new DeleteProductUseCase(getProductByIdUseCase, repository);
+    }
+
+    /**
+     * Instantiates the use case responsible for retrieving a paginated list of
+     * products.
+     *
+     * @param repository the {@link ProductRepository} used by the
+     *                   use case to query data
+     * @return an initialized instance of {@link FindAllProductUseCase}
+     */
+    @Bean
+    public FindAllProductUseCase findAllProductUseCase(ProductRepository repository) {
+        return new FindAllProductUseCase(repository);
     }
 }

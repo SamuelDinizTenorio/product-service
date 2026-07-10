@@ -8,41 +8,30 @@ import com.samuel.productservice.core.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 
 /**
- * Use case responsible for orchestrating the update of an existing product.
+ * Use case responsible for orchestrating the structural update of an existing
+ * product.
  * <p>
- * This class coordinates the domain logic to ensure a product is first
- * retrieved, then modified with new data (respecting domain invariants), and
- * finally persisted back to the system.
+ * This component manages the sequential flow of state mutations by recovering
+ * the active domain aggregate, applying safe field updates, and synchronizing
+ * changes back to the storage layer.
  */
 @AllArgsConstructor
 public class UpdateProductUseCase {
 
-    /**
-     * The data access gateway used to query product records.
-     */
     private final ProductRepository repository;
-
-    /**
-     * The internal use case dependency utilized to retrieve the current state of a
-     * product.
-     */
     private final GetProductByIdUseCase getProductByIdUseCase;
 
     /**
-     * Executes the use case to update a product based on its ID.
-     * <p>
-     * Retrieves the existing {@link Product} entity, applies the changes from
-     * {@code productData}, and delegates the update operation to the
-     * {@link ProductRepository}. Domain validation rules are enforced during the
-     * entity's {@code update} method call.
+     * Executes the business state modification sequence on an existing product
+     * aggregate.
      *
-     * @param id          the unique identifier of the product to be updated; must
-     *                    not be {@code null}
-     * @param productData the {@link Product} entity carrying the new field values
-     *                    to apply to the existing record
-     * @return the updated {@link Product} entity after persistent storage
-     *         synchronization
-     * @throws NotFoundException if no product matches the provided {@code id}
+     * @param id          the unique {@link UUID} of the product aggregate to
+     *                    modify; must not be {@code null}
+     * @param productData the {@link Product} template aggregate containing the
+     *                    fresh state transformations to apply
+     * @return the fully updated and persisted {@link Product} domain aggregate
+     * @throws NotFoundException if the targeted product aggregate cannot be
+     *                           identified by the provided {@code id}
      */
     public Product execute(UUID id, Product productData) {
         var existingProduct = getProductByIdUseCase.execute(id);

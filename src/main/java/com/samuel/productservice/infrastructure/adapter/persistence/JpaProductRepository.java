@@ -3,6 +3,8 @@ package com.samuel.productservice.infrastructure.adapter.persistence;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -30,4 +32,14 @@ public interface JpaProductRepository extends JpaRepository<ProductEntity, UUID>
      *         specified SKU
      */
     Optional<ProductEntity> findBySku(String sku);
+
+    /**
+     * Retrieves a paginated collection of all product records from the database.
+     *
+     * @param pageable the pagination and sorting metadata configuration;
+     *                 must not be {@code null}
+     * @return a {@link Page} containing the retrieved {@link ProductEntity}
+     *         instances matching the pagination constraints
+     */
+    Page<ProductEntity> findAll(Pageable pageable);
 }

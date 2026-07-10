@@ -7,31 +7,27 @@ import com.samuel.productservice.core.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 
 /**
- * Use case responsible for retrieving a product based on its unique stock
- * keeping unit (SKU).
+ * Use case responsible for retrieving a product aggregate by its unique
+ * business code (SKU).
  * <p>
- * This class coordinates the domain logic to ensure that a product exists for
- * the requested business code, establishing a bridge between the application
- * entry points and the underlying persistence layer.
+ * This component bridges application entry points to the relational storage
+ * layer to fetch active business records matching specific domain keys.
  */
 @AllArgsConstructor
 public class GetProductBySkuUseCase {
 
-    /**
-     * The data access gateway used to query product records.
-     */
     private final ProductRepository repository;
 
     /**
-     * Executes the use case to find a product matching the specified SKU.
-     * <p>
-     * Queries the underlying {@link ProductRepository} and ensures an instance is
-     * returned if found, enforcing that missing records terminate abnormally.
+     * Executes the operational query to locate a product aggregate by its unique
+     * business SKU.
      *
-     * @param sku the unique stock keeping unit identifier, must not be {@code null}
-     *            or empty
-     * @return the {@link Product} entity associated with the given identifier
-     * @throws NotFoundException if no product matches the provided {@code sku}
+     * @param sku the unique stock keeping unit identifier;
+     *            must not be {@code null} or empty
+     * @return the reconstituted {@link Product} aggregate associated with
+     *         the provided business code
+     * @throws NotFoundException if no product aggregate matches
+     *                           the specified {@code sku}
      */
     public Product execute(String sku) {
         return repository.findBySku(sku)

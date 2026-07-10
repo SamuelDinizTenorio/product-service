@@ -9,31 +9,28 @@ import com.samuel.productservice.core.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 
 /**
- * Use case responsible for retrieving a product based on its unique identifier
- * (ID).
+ * Use case responsible for retrieving a product aggregate by its unique
+ * identifier.
  * <p>
- * This class coordinates the domain logic to ensure that a product exists for
- * the requested identifier, establishing a bridge between the application entry
- * points and the underlying persistence layer.
+ * This component acts as a direct query bridge to fetch a single core
+ * aggregate, enforcing exceptional boundary flows when a requested resource
+ * cannot be recovered.
  */
 @AllArgsConstructor
 public class GetProductByIdUseCase {
 
-    /**
-     * The data access gateway used to query product records.
-     */
     private final ProductRepository repository;
 
     /**
-     * Executes the use case to find a product matching the specified ID.
-     * <p>
-     * Queries the underlying {@link ProductRepository} and ensures an instance is
-     * returned if found, enforcing that missing records terminate abnormally.
+     * Executes the resolution query to locate a product aggregate by its unique
+     * identifier.
      *
-     * @param id the {@link UUID} representing the unique identifier of the target
-     *           product; must not be {@code null}
-     * @return the {@link Product} entity associated with the provided identifier
-     * @throws NotFoundException if no product matches the provided {@code id}
+     * @param id the unique {@link UUID} of the target product aggregate;
+     *           must not be {@code null}
+     * @return the reconstituted {@link Product} aggregate associated with
+     *         the specified identifier
+     * @throws NotFoundException if no product aggregate matches
+     *                           the provide {@code id}
      */
     public Product execute(UUID id) {
         return repository.findById(id)

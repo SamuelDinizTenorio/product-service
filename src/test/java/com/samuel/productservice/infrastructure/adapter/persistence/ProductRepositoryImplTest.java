@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 
+import com.samuel.productservice.core.model.Product;
 import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductPersistenceMapper;
 import com.samuel.productservice.infrastructure.config.BaseContainersIntegrationTest;
@@ -111,6 +113,57 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
 
             // Assert
             assertThat(foundProduct).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Should retrieve a paginated collection of reconstituted product aggregates")
+        void shouldRetrievePaginatedProducts() {
+            // Arrange
+            var product1 = ProductFixture.withSku("REPO-PAGE-1");
+            var product2 = ProductFixture.withSku("REPO-PAGE-2");
+            productRepository.save(product1);
+            productRepository.save(product2);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            final var pageable = PageRequest.of(0, 10);
+
+            // Act
+            final var actualPage = productRepository.findAll(pageable);
+
+            // Assert
+            assertThat(actualPage)
+                    .isNotNull()
+                    .isNotEmpty();
+
+            // Ensures that domain aggregates are persisted correctly and reconstituted
+            assertThat(actualPage.getContent())
+                    .extracting(Product::getSku)
+                    .contains(product1.getSku(), product2.getSku());
+        }
+
+        @Test
+        @DisplayName("Should return an empty page when querying a page index out of bounds")
+        void shouldReturnEmptyPageWhenIndexOutOfBounds() {
+            // Arrange - Ensures at least one item so the table is not completely empty.
+            var product = ProductFixture.withSku("REPO-EMPTY-PAGE");
+            productRepository.save(product);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            // Requests a very distant page (e.g., page 50) where we know there
+            // will be no data.
+            final var pageable = PageRequest.of(50, 10);
+
+            // Act
+            final var actualPage = productRepository.findAll(pageable);
+
+            // Assert
+            assertThat(actualPage)
+                    .isNotNull()
+                    .isEmpty();
         }
     }
 

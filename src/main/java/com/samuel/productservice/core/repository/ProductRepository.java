@@ -3,6 +3,9 @@ package com.samuel.productservice.core.repository;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.samuel.productservice.core.model.Product;
 
 /**
@@ -74,4 +77,15 @@ public interface ProductRepository {
      *           {@code null}
      */
     void deleteById(UUID id);
+
+    /**
+     * Retrieves a paginated collection of all product aggregates from
+     * the data store.
+     *
+     * @param pageable the pagination and sorting configuration metadata;
+     *                 must not be {@code null}
+     * @return a {@link Page} containing the retrieved {@link Product} aggregates
+     *         matching the pagination criteria
+     */
+    Page<Product> findAll(Pageable pageable);
 }

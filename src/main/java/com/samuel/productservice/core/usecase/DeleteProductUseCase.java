@@ -10,29 +10,24 @@ import lombok.AllArgsConstructor;
 /**
  * Use case responsible for orchestrating the deletion of an existing product.
  * <p>
- * This class coordinates the domain logic to ensure a product exists before
- * requesting its removal from the persistence layer.
+ * This component coordinates domain logic to guarantee that a target product
+ * aggregate exists within the system before triggering its physical removal via
+ * the persistence layer.
  */
 @AllArgsConstructor
 public class DeleteProductUseCase {
 
-    /**
-     * The internal use case dependency used to verify the product's existence
-     * before deletion.
-     */
     private final GetProductByIdUseCase getProductByIdUseCase;
-
-    /**
-     * The data access gateway used to perform product deletion operations.
-     */
     private final ProductRepository repository;
 
     /**
-     * Executes the use case to delete a product based on its ID.
+     * Executes the business logic to remove a product aggregate by its unique
+     * identifier.
      *
-     * @param id the unique identifier of the product to be deleted; must not be
-     *           {@code null}
-     * @throws NotFoundException if no product matches the provided {@code id}
+     * @param id the unique {@link UUID} identifier of the target product to be
+     *           deleted; must not be {@code null}
+     * @throws NotFoundException if no product aggregate matches the specified
+     *                           {@code id}
      */
     public void execute(UUID id) {
         getProductByIdUseCase.execute(id);
