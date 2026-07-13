@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import com.samuel.productservice.core.exception.NotFoundException;
 import com.samuel.productservice.core.fixture.ProductFixture;
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.core.repository.ProductRepository;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 class GetProductByIdUseCaseTest {
 
         @Mock
-        private ProductRepository repository;
+        private ProductGateway repository;
 
         @InjectMocks
         private GetProductByIdUseCase getProductByIdUseCase;

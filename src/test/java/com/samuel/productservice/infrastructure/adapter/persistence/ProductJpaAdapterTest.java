@@ -20,15 +20,15 @@ import com.samuel.productservice.infrastructure.config.BaseContainersIntegration
 
 import jakarta.persistence.EntityManager;
 
-@Import({ ProductRepositoryImpl.class, ProductPersistenceMapper.class })
+@Import({ ProductJpaAdapter.class, ProductPersistenceMapper.class })
 @DisplayName("ProductRepositoryImpl Integration Tests with Testcontainers")
-class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
+class ProductJpaAdapterTest extends BaseContainersIntegrationTest {
 
     @Autowired
-    private ProductRepositoryImpl productRepository;
+    private ProductJpaAdapter productJpaAdapter;
 
     @Autowired
-    private JpaProductRepository jpaProductRepository;
+    private ProductJpaRepository productJpaRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -43,7 +43,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             // Arrange
             var product = ProductFixture.withSku("REPO-FIND-ID");
             var productId = product.getId();
-            productRepository.save(product);
+            productJpaAdapter.save(product);
 
             // Flush/Clear to ensure that findById fetches from the actual database rather
             // than the Hibernate cache.
@@ -51,7 +51,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             entityManager.clear();
 
             // Act
-            var foundProduct = productRepository.findById(productId);
+            var foundProduct = productJpaAdapter.findById(productId);
 
             // Assert
             assertThat(foundProduct)
@@ -70,7 +70,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         @DisplayName("Should return empty optional when product does not exist")
         void shouldReturnEmptyWhenIdNotFound() {
             // Act
-            var foundProduct = productRepository.findById(UUID.randomUUID());
+            var foundProduct = productJpaAdapter.findById(UUID.randomUUID());
 
             // Assert
             assertThat(foundProduct).isEmpty();
@@ -82,7 +82,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             // Arrange
             var product = ProductFixture.withSku("REPO-FIND-SKU");
             var productSku = product.getSku();
-            productRepository.save(product);
+            productJpaAdapter.save(product);
 
             // Flush/Clear to ensure that findById fetches from the actual database rather
             // than the Hibernate cache.
@@ -90,7 +90,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             entityManager.clear();
 
             // Act
-            var foundProduct = productRepository.findBySku(productSku);
+            var foundProduct = productJpaAdapter.findBySku(productSku);
 
             // Assert
             assertThat(foundProduct)
@@ -109,7 +109,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         @DisplayName("Should return empty optional when product SKU does not exist")
         void shouldReturnEmptyWhenSkuNotFound() {
             // Act
-            var foundProduct = productRepository.findBySku("NON-EXISTENT-SKU-999");
+            var foundProduct = productJpaAdapter.findBySku("NON-EXISTENT-SKU-999");
 
             // Assert
             assertThat(foundProduct).isEmpty();
@@ -121,8 +121,8 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             // Arrange
             var product1 = ProductFixture.withSku("REPO-PAGE-1");
             var product2 = ProductFixture.withSku("REPO-PAGE-2");
-            productRepository.save(product1);
-            productRepository.save(product2);
+            productJpaAdapter.save(product1);
+            productJpaAdapter.save(product2);
 
             entityManager.flush();
             entityManager.clear();
@@ -130,7 +130,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             final var pageable = PageRequest.of(0, 10);
 
             // Act
-            final var actualPage = productRepository.findAll(pageable);
+            final var actualPage = productJpaAdapter.findAll(pageable);
 
             // Assert
             assertThat(actualPage)
@@ -148,7 +148,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
         void shouldReturnEmptyPageWhenIndexOutOfBounds() {
             // Arrange - Ensures at least one item so the table is not completely empty.
             var product = ProductFixture.withSku("REPO-EMPTY-PAGE");
-            productRepository.save(product);
+            productJpaAdapter.save(product);
 
             entityManager.flush();
             entityManager.clear();
@@ -158,7 +158,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             final var pageable = PageRequest.of(50, 10);
 
             // Act
-            final var actualPage = productRepository.findAll(pageable);
+            final var actualPage = productJpaAdapter.findAll(pageable);
 
             // Assert
             assertThat(actualPage)
@@ -179,7 +179,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             var productId = product.getId();
 
             // Act
-            var savedProduct = productRepository.save(product);
+            var savedProduct = productJpaAdapter.save(product);
 
             entityManager.flush();
             entityManager.clear();
@@ -188,7 +188,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             assertThat(savedProduct).isNotNull();
             assertThat(savedProduct.getId()).isEqualTo(productId);
 
-            var entityInDatabase = jpaProductRepository.findById(productId);
+            var entityInDatabase = productJpaRepository.findById(productId);
             assertThat(entityInDatabase)
                     .isPresent()
                     .hasValueSatisfying(entity -> {
@@ -217,13 +217,13 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             // Creates and persists the original product in the database.
             var originalProduct = ProductFixture.withSku("REPO-UPDATE");
             var productId = originalProduct.getId();
-            productRepository.save(originalProduct);
+            productJpaAdapter.save(originalProduct);
 
             entityManager.flush();
             entityManager.clear();
 
             // Modifies the object's state using the rich domain's business method.
-            var productToUpdate = productRepository.findById(productId).orElseThrow();
+            var productToUpdate = productJpaAdapter.findById(productId).orElseThrow();
             productToUpdate.update(
                     "SKU-UPDATE-02", // New SKU
                     "Monitor Gamer Ultrawide", // New Name
@@ -233,7 +233,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             );
 
             // Act - Executes the update that uses toUpdateEntity(isNew = false).
-            var updatedProduct = productRepository.update(productToUpdate);
+            var updatedProduct = productJpaAdapter.update(productToUpdate);
 
             entityManager.flush();
             entityManager.clear();
@@ -245,7 +245,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
 
             // Physical Verification – Ensures that the changes were actually committed to
             // the database within the container.
-            var entityInDatabase = jpaProductRepository.findById(productId);
+            var entityInDatabase = productJpaRepository.findById(productId);
             assertThat(entityInDatabase)
                     .isPresent()
                     .hasValueSatisfying(entity -> {
@@ -271,13 +271,13 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             // Arrange - Creates and persists the product in the container's database.
             var product = ProductFixture.withSku("REPO-DELETE");
             var productId = product.getId();
-            productRepository.save(product);
+            productJpaAdapter.save(product);
 
             entityManager.flush();
             entityManager.clear();
 
             // Act
-            productRepository.deleteById(productId);
+            productJpaAdapter.deleteById(productId);
 
             // Synchronizes the persistence context to ensure the deletion has been
             // committed to the physical database.
@@ -285,7 +285,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             entityManager.clear();
 
             // Assert
-            var deletedProductInDatabase = jpaProductRepository.findById(productId);
+            var deletedProductInDatabase = productJpaRepository.findById(productId);
             assertThat(deletedProductInDatabase).isEmpty();
         }
 
@@ -296,7 +296,7 @@ class ProductRepositoryImplTest extends BaseContainersIntegrationTest {
             var nonExistentId = UUID.randomUUID();
 
             // Act & Assert
-            assertDoesNotThrow(() -> productRepository.deleteById(nonExistentId));
+            assertDoesNotThrow(() -> productJpaAdapter.deleteById(nonExistentId));
         }
     }
 }

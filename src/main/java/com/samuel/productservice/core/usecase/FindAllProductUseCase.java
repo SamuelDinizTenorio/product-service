@@ -3,7 +3,7 @@ package com.samuel.productservice.core.usecase;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.samuel.productservice.core.repository.ProductRepository;
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
 
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FindAllProductUseCase {
 
-    private ProductRepository repository;
+    private ProductGateway repository;
 
     /**
      * Executes the paginated query to retrieve product aggregates.

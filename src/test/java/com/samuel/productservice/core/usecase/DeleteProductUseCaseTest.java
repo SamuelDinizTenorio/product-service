@@ -13,8 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.samuel.productservice.core.exception.NotFoundException;
 import com.samuel.productservice.core.fixture.ProductFixture;
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.core.repository.ProductRepository;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 class DeleteProductUseCaseTest {
 
     @Mock
-    private ProductRepository repository;
+    private ProductGateway repository;
 
     @Mock
     private GetProductByIdUseCase getProductByIdUseCase;

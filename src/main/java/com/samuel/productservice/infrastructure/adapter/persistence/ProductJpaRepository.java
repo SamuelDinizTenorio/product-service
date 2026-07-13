@@ -19,7 +19,7 @@ import com.samuel.productservice.infrastructure.adapter.persistence.entity.Produ
  * query generation contract requirements.
  */
 @Repository
-public interface JpaProductRepository extends JpaRepository<ProductEntity, UUID> {
+public interface ProductJpaRepository extends JpaRepository<ProductEntity, UUID> {
 
     /**
      * Executes a derived query to locate a specific product record by its unique

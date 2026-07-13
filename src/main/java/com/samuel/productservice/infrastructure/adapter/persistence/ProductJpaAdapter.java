@@ -7,31 +7,31 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.core.repository.ProductRepository;
 import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductPersistenceMapper;
 
 import lombok.AllArgsConstructor;
 
 /**
  * Infrastructure repository adapter implementing the core domain
- * {@link ProductRepository} interface.
+ * {@link ProductGateway} interface.
  * <p>
  * Following the Ports and Adapters (Hexagonal) architecture pattern, this
  * component acts as a secondary adapter that fulfills the persistence port by
  * orchestrating interactions between a Spring Data JPA database repository
- * ({@link JpaProductRepository}) and a structural mapping layer
+ * ({@link ProductJpaRepository}) and a structural mapping layer
  * ({@link ProductPersistenceMapper}).
  */
 @Component
 @AllArgsConstructor
-public class ProductRepositoryImpl implements ProductRepository {
+public class ProductJpaAdapter implements ProductGateway {
 
     /**
      * The Spring Data JPA data access layer providing low-level relational
      * operations.
      */
-    private final JpaProductRepository repository;
+    private final ProductJpaRepository repository;
 
     /**
      * The utility mapper used to transform structures across layer boundaries.
@@ -49,7 +49,7 @@ public class ProductRepositoryImpl implements ProductRepository {
      *         otherwise
      */
     @Override
-    public Optional<Product> findById(UUID id) {
+    public Optional<Product> findById(final UUID id) {
         return repository.findById(id)
                 .map(mapper::toDomain);
     }
@@ -65,7 +65,7 @@ public class ProductRepositoryImpl implements ProductRepository {
      *         otherwise
      */
     @Override
-    public Optional<Product> findBySku(String sku) {
+    public Optional<Product> findBySku(final String sku) {
         return repository.findBySku(sku)
                 .map(mapper::toDomain);
     }
@@ -84,7 +84,7 @@ public class ProductRepositoryImpl implements ProductRepository {
      * @return the saved and reconstituted {@link Product} aggregate instance
      */
     @Override
-    public Product save(Product product) {
+    public Product save(final Product product) {
         var entity = mapper.toNewEntity(product);
         var savedEntity = repository.save(entity);
         return mapper.toDomain(savedEntity);
@@ -104,7 +104,7 @@ public class ProductRepositoryImpl implements ProductRepository {
      * @return the updated and reconstituted {@link Product} aggregate instance
      */
     @Override
-    public Product update(Product product) {
+    public Product update(final Product product) {
         var entity = mapper.toUpdateEntity(product);
         var savedEntity = repository.save(entity);
         return mapper.toDomain(savedEntity);
@@ -115,7 +115,7 @@ public class ProductRepositoryImpl implements ProductRepository {
      * identifier.
      * <p>
      * This implementation delegates the deletion request directly to the
-     * underlying {@link JpaProductRepository}, which handles the physical removal
+     * underlying {@link ProductJpaRepository}, which handles the physical removal
      * of the corresponding database record. If no product with the specified ID
      * exists, the operation completes silently without error, consistent with the
      * repository contract.
@@ -124,7 +124,7 @@ public class ProductRepositoryImpl implements ProductRepository {
      *           {@code null}
      */
     @Override
-    public void deleteById(UUID id) {
+    public void deleteById(final UUID id) {
         repository.deleteById(id);
     }
 
@@ -142,7 +142,7 @@ public class ProductRepositoryImpl implements ProductRepository {
      *         aggregates matching the pagination constraints
      */
     @Override
-    public Page<Product> findAll(Pageable pageable) {
+    public Page<Product> findAll(final Pageable pageable) {
         return repository.findAll(pageable)
                 .map(mapper::toDomain);
     }

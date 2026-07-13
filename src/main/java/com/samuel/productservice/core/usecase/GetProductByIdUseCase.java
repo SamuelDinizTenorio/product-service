@@ -3,8 +3,8 @@ package com.samuel.productservice.core.usecase;
 import java.util.UUID;
 
 import com.samuel.productservice.core.exception.NotFoundException;
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.core.repository.ProductRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -19,7 +19,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class GetProductByIdUseCase {
 
-    private final ProductRepository repository;
+    private final ProductGateway repository;
 
     /**
      * Executes the resolution query to locate a product aggregate by its unique

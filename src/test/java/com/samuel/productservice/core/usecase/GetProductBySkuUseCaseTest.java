@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import com.samuel.productservice.core.exception.NotFoundException;
 import com.samuel.productservice.core.fixture.ProductFixture;
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.core.repository.ProductRepository;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 class GetProductBySkuUseCaseTest {
 
         @Mock
-        private ProductRepository repository;
+        private ProductGateway repository;
 
         @InjectMocks
         private GetProductBySkuUseCase getProductBySkuUseCase;

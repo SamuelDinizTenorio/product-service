@@ -1,4 +1,4 @@
-package com.samuel.productservice.core.repository;
+package com.samuel.productservice.core.gateway;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +16,7 @@ import com.samuel.productservice.core.model.Product;
  * products, decoupling the core business logic from underlying data access
  * technologies and infrastructures.
  */
-public interface ProductRepository {
+public interface ProductGateway {
 
     /**
      * Retrieves a product aggregate by its unique identifier.

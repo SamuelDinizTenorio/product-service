@@ -1,8 +1,8 @@
 package com.samuel.productservice.core.usecase;
 
 import com.samuel.productservice.core.exception.ConflictException;
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.core.repository.ProductRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CreateProductUseCase {
 
-    private final ProductRepository repository;
+    private final ProductGateway repository;
 
     /**
      * Executes the business logic to create and persist a new product aggregate.

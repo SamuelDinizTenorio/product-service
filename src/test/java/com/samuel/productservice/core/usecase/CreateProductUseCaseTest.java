@@ -13,8 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.samuel.productservice.core.exception.ConflictException;
 import com.samuel.productservice.core.fixture.ProductFixture;
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.core.repository.ProductRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 class CreateProductUseCaseTest {
 
         @Mock
-        private ProductRepository repository;
+        private ProductGateway repository;
 
         @InjectMocks
         private CreateProductUseCase createProductUseCase;

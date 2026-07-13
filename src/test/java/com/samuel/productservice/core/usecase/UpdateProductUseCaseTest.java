@@ -11,8 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.samuel.productservice.core.fixture.ProductFixture;
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
-import com.samuel.productservice.core.repository.ProductRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 class UpdateProductUseCaseTest {
 
         @Mock
-        private ProductRepository repository;
+        private ProductGateway repository;
 
         @Mock
         private GetProductByIdUseCase getProductByIdUseCase;

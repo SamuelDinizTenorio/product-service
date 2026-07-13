@@ -3,7 +3,7 @@ package com.samuel.productservice.infrastructure.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.samuel.productservice.core.repository.ProductRepository;
+import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.usecase.CreateProductUseCase;
 import com.samuel.productservice.core.usecase.DeleteProductUseCase;
 import com.samuel.productservice.core.usecase.FindAllProductUseCase;
@@ -26,12 +26,12 @@ public class ProductUseCaseConfig {
      * Instantiates the use case for retrieving a product by its unique
      * identifier.
      *
-     * @param repository the {@link ProductRepository} used by the use case to query
+     * @param repository the {@link ProductGateway} used by the use case to query
      *                   data
      * @return an initialized instance of {@link GetProductByIdUseCase}
      */
     @Bean
-    public GetProductByIdUseCase getProductByIdUseCase(ProductRepository repository) {
+    public GetProductByIdUseCase getProductByIdUseCase(ProductGateway repository) {
         return new GetProductByIdUseCase(repository);
     }
 
@@ -39,12 +39,12 @@ public class ProductUseCaseConfig {
      * Instantiates the use case for retrieving a product by its unique stock
      * keeping unit.
      *
-     * @param repository the {@link ProductRepository} used by the use case to query
+     * @param repository the {@link ProductGateway} used by the use case to query
      *                   data; must not be {@code null}
      * @return an initialized instance of {@link GetProductBySkuUseCase}
      */
     @Bean
-    public GetProductBySkuUseCase getProductBySkuUseCase(ProductRepository repository) {
+    public GetProductBySkuUseCase getProductBySkuUseCase(ProductGateway repository) {
         return new GetProductBySkuUseCase(repository);
     }
 
@@ -52,12 +52,12 @@ public class ProductUseCaseConfig {
      * Instantiates the use case responsible for handling product creation
      * logic.
      *
-     * @param repository the {@link ProductRepository} used by the use case to
+     * @param repository the {@link ProductGateway} used by the use case to
      *                   persist new items
      * @return an initialized instance of {@link CreateProductUseCase}
      */
     @Bean
-    public CreateProductUseCase createProductUseCase(ProductRepository repository) {
+    public CreateProductUseCase createProductUseCase(ProductGateway repository) {
         return new CreateProductUseCase(repository);
     }
 
@@ -65,7 +65,7 @@ public class ProductUseCaseConfig {
      * Instantiates the use case responsible for updating existing product
      * information.
      *
-     * @param repository            the {@link ProductRepository} used by the use
+     * @param repository            the {@link ProductGateway} used by the use
      *                              case to save changes
      * @param getProductByIdUseCase the {@link GetProductByIdUseCase} dependency
      *                              required to look up the target product before
@@ -74,7 +74,7 @@ public class ProductUseCaseConfig {
      */
     @Bean
     public UpdateProductUseCase updateProductUseCase(
-            ProductRepository repository,
+            ProductGateway repository,
             GetProductByIdUseCase getProductByIdUseCase) {
         return new UpdateProductUseCase(repository, getProductByIdUseCase);
     }
@@ -82,7 +82,7 @@ public class ProductUseCaseConfig {
     /**
      * Instantiates the use case responsible for handling product deletion logic.
      *
-     * @param repository            the {@link ProductRepository} used by the use
+     * @param repository            the {@link ProductGateway} used by the use
      *                              case to execute the deletion
      * @param getProductByIdUseCase the {@link GetProductByIdUseCase} dependency
      *                              required to verify the product's existence
@@ -91,7 +91,7 @@ public class ProductUseCaseConfig {
      */
     @Bean
     public DeleteProductUseCase deleteProductUseCase(
-            ProductRepository repository,
+            ProductGateway repository,
             GetProductByIdUseCase getProductByIdUseCase) {
         return new DeleteProductUseCase(getProductByIdUseCase, repository);
     }
@@ -100,12 +100,12 @@ public class ProductUseCaseConfig {
      * Instantiates the use case responsible for retrieving a paginated list of
      * products.
      *
-     * @param repository the {@link ProductRepository} used by the
+     * @param repository the {@link ProductGateway} used by the
      *                   use case to query data
      * @return an initialized instance of {@link FindAllProductUseCase}
      */
     @Bean
-    public FindAllProductUseCase findAllProductUseCase(ProductRepository repository) {
+    public FindAllProductUseCase findAllProductUseCase(ProductGateway repository) {
         return new FindAllProductUseCase(repository);
     }
 }

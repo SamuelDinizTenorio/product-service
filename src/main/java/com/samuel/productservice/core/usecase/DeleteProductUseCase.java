@@ -3,7 +3,7 @@ package com.samuel.productservice.core.usecase;
 import java.util.UUID;
 
 import com.samuel.productservice.core.exception.NotFoundException;
-import com.samuel.productservice.core.repository.ProductRepository;
+import com.samuel.productservice.core.gateway.ProductGateway;
 
 import lombok.AllArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 public class DeleteProductUseCase {
 
     private final GetProductByIdUseCase getProductByIdUseCase;
-    private final ProductRepository repository;
+    private final ProductGateway repository;
 
     /**
      * Executes the business logic to remove a product aggregate by its unique
