@@ -34,11 +34,12 @@ class ProductPersistenceMapperTest {
             assertThat(entity)
                     .isNotNull()
                     .usingRecursiveComparison()
-                    .ignoringFields("isNew") // isNew does not exist in the Domain, so we ignore it.
+                    .ignoringFields("sku", "isNew") // isNew does not exist in the Domain, so we ignore it.
                     .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
                     .isEqualTo(product);
 
             assertThat(entity.isNew()).isTrue();
+            assertThat(entity.getSku()).isEqualTo(product.getSku().getValue());
         }
 
         @Test
@@ -70,11 +71,13 @@ class ProductPersistenceMapperTest {
             assertThat(entity)
                     .isNotNull()
                     .usingRecursiveComparison()
-                    .ignoringFields("isNew") // isNew does not exist in the Domain, so we ignore it.
+                    .ignoringFields("sku", "isNew") // isNew does not exist in the Domain, so we ignore it.
                     .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
                     .isEqualTo(product);
 
             assertThat(entity.isNew()).isFalse();
+            assertThat(entity.getSku()).isEqualTo(product.getSku().getValue());
+
         }
 
         @Test
@@ -106,8 +109,11 @@ class ProductPersistenceMapperTest {
             assertThat(product)
                     .isNotNull()
                     .usingRecursiveComparison()
+                    .ignoringFields("sku")
                     .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
                     .isEqualTo(entity);
+
+            assertThat(product.getSku().getValue()).isEqualTo(entity.getSku());
         }
 
         @Test

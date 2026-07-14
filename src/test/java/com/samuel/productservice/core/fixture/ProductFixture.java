@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import com.samuel.productservice.core.model.Product;
+import com.samuel.productservice.core.model.Sku;
 
 import lombok.experimental.UtilityClass;
 
@@ -49,7 +50,7 @@ public class ProductFixture {
     public Product reconstituteWithId(final UUID id) {
         return Product.reconstitute(
                 id,
-                "SKU-DEFAULT",
+                Sku.reconstitute("SKU-DEFAULT"),
                 "Default Product Name",
                 BigDecimal.TEN,
                 BigDecimal.TEN,
@@ -73,20 +74,23 @@ public class ProductFixture {
      * <p>
      * Appends a random four-character suffix to the provided base SKU to ensure
      * uniqueness and prevent database constraint violations during integration
-     * tests.
+     * tests. The base SKU is automatically truncated to 25 characters if necessary
+     * to guarantee the final generated string strictly respects the domain's
+     * 30-character maximum limit.
      *
      * @param baseSku the base string used to generate the unique stock keeping unit
      * @return a new {@link Product} instance configured with a unique SKU and
      *         matching name
      */
     public Product withSku(final String baseSku) {
-        final var uniqueSuffix = UUID.randomUUID()
-                .toString()
-                .substring(0, 4);
+        final var uniqueSuffix = UUID.randomUUID().toString().substring(0, 4);
+
+        final var safeBase = baseSku.length() > 25 ? baseSku.substring(0, 25) : baseSku;
+        final var generatedSku = safeBase + "-" + uniqueSuffix;
 
         return Product.create(
-                baseSku + "-" + uniqueSuffix,
-                "Product Test " + baseSku,
+                generatedSku,
+                "Product Test " + safeBase,
                 BigDecimal.ONE,
                 BigDecimal.valueOf(100),
                 BigDecimal.valueOf(200));

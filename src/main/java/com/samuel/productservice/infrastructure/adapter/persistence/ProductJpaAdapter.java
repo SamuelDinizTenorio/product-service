@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
+import com.samuel.productservice.core.model.Sku;
 import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductPersistenceMapper;
 
 import lombok.AllArgsConstructor;
@@ -65,8 +66,8 @@ public class ProductJpaAdapter implements ProductGateway {
      *         otherwise
      */
     @Override
-    public Optional<Product> findBySku(final String sku) {
-        return repository.findBySku(sku)
+    public Optional<Product> findBySku(final Sku sku) {
+        return repository.findBySku(sku.getValue())
                 .map(mapper::toDomain);
     }
 

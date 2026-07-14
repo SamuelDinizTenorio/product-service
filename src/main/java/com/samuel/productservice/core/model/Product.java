@@ -12,16 +12,16 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
- * Represents a product domain entity with business rule validation.
+ * Represents the Product aggregate root within the core domain layer.
  * <p>
- * This entity enforces core domain invariants such as mandatory attributes,
- * string length thresholds, and transactional consistency between cost and
- * price.
+ * This entity encapsulates and enforces essential business invariants, ensuring
+ * structural consistency for mandatory attributes, string constraints, and
+ * valid monetary relationships between product costs and commercial prices.
  * <p>
- * <strong>Note on Equality:</strong> In accordance with Domain-Driven Design
- * (DDD) principles, equality and identity ({@code equals} and {@code hashCode})
- * are governed strictly by the product's unique identifier ({@code id}),
- * regardless of state mutations.
+ * <strong>Identity and Equality:</strong> In compliance with Domain-Driven
+ * Design (DDD) conventions, identity and equality definitions ({@code equals}
+ * and {@code hashCode}) are strictly bound to the immutable unique identifier
+ * ({@code id}), persisting uniformly across any state transitions or mutations.
  */
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -34,9 +34,9 @@ public class Product {
     private UUID id;
 
     /**
-     * The stock keeping unit identifier.
+     * The encapsulated Stock Keeping Unit (SKU) value object.
      */
-    private String sku;
+    private Sku sku;
 
     /**
      * The descriptive name of the product.
@@ -59,25 +59,47 @@ public class Product {
     private BigDecimal price;
 
     /**
-     * Initializes a new {@link Product} with all specified fields and executes
-     * self-validation.
+     * Standard internal constructor used for new instances and state updates.
+     * Executes self-validation routines upon assignment.
      *
-     * @param id    the unique string identifier of the product
-     * @param sku   the stock keeping unit; must not be {@code null} or blank
-     * @param name  the product name; must be between 5 and 200 characters long when
-     *              trimmed, and must not be {@code null}
-     * @param stock the initial stock quantity; must be a non-negative value, and
-     *              must not be {@code null}
-     * @param cost  the unit cost value; must be strictly greater than zero, and
-     *              must not be {@code null}
-     * @param price the consumer selling price; must be strictly greater than
-     *              {@code cost}, and must not be {@code null}
-     * @throws NotificationException if any provided argument violates product
-     *                               business invariants
+     * @param id     the unique identifier of the product
+     * @param rawSku the raw, unvalidated string representation of the SKU
+     * @param name   the descriptive name of the product
+     * @param stock  the inventory stock quantity
+     * @param cost   the unit acquisition cost
+     * @param price  the commercial selling price
+     * @throws NotificationException if any domain invariant constraint is violated
      */
     private Product(
             final UUID id,
-            final String sku,
+            final String rawSku,
+            final String name,
+            final BigDecimal stock,
+            final BigDecimal cost,
+            final BigDecimal price) {
+        this.id = id;
+        this.name = name != null ? name.trim() : null;
+        this.stock = stock;
+        this.cost = cost;
+        this.price = price;
+        selfValidate(rawSku);
+    }
+
+    /**
+     * Technical internal constructor dedicated exclusively to state reconstitution
+     * workflows.Bypasses active validation checkpoints to load verified historical
+     * states safely.
+     *
+     * @param id    the unique identifier of the product
+     * @param sku   the pre-validated {@link Sku} value object
+     * @param name  the descriptive name of the product
+     * @param stock the current inventory stock quantity
+     * @param cost  the unit acquisition cost
+     * @param price the commercial selling price
+     */
+    private Product(
+            final UUID id,
+            final Sku sku,
             final String name,
             final BigDecimal stock,
             final BigDecimal cost,
@@ -88,24 +110,21 @@ public class Product {
         this.stock = stock;
         this.cost = cost;
         this.price = price;
-        selfValidate();
     }
 
     /**
-     * Creates and validates a new {@link Product} instance with a randomly
-     * generated unique identifier.
+     * Factory method to initialize and validate a new {@link Product} aggregate
+     * instance with a randomly assigned unique identifier.
      *
-     * @param sku   the stock keeping unit; must not be {@code null} or blank
-     * @param name  the product name; must be between 5 and 200 characters long when
-     *              trimmed, and must not be {@code null}
-     * @param stock the initial stock quantity; must be a non-negative value, and
-     *              must not be {@code null}
-     * @param cost  the unit cost value; must be strictly greater than zero, and
-     *              must not be {@code null}
-     * @param price the consumer selling price; must be strictly greater than
-     *              {@code cost}, and must not be {@code null}
-     * @return a fully validated {@link Product} instance
-     * @throws NotificationException if any parameter fails to comply with domain
+     * @param sku   the raw SKU string identifier; must not be null or blank
+     * @param name  the product name; must contain between 5 and 200 characters
+     *              when trimmed
+     * @param stock the initial stock quantity; must be a non-negative value
+     * @param cost  the unit cost; must be strictly greater than zero
+     * @param price the consumer selling price; must be strictly greater than the
+     *              unit cost
+     * @return a fully validated and instantiated {@link Product} aggregate root
+     * @throws NotificationException if any parameter fails to satisfy domain
      *                               constraints
      */
     public static Product create(
@@ -119,48 +138,47 @@ public class Product {
     }
 
     /**
-     * Reconstitutes an existing {@link Product} aggregate from a known persistent
-     * state.
+     * Reconstitutes an established {@link Product} aggregate instance from a
+     * persistent data store.
      * <p>
-     * This factory method bypasses new entity initialization workflows, allowing
-     * the domain layer to safely reload established state from data stores.
+     * This method bypasses domain lifecycle checks, enabling the persistence
+     * mechanism to safely remap historical data states back into the domain layer.
+     * </p>
      *
-     * @param id    the unique {@link UUID} identifier of the product
-     * @param sku   the stock keeping unit identifier
-     * @param name  the product name
-     * @param stock the current stock quantity
-     * @param cost  the unit cost value
-     * @param price the commercial selling price
-     * @return a {@link Product} instance populated with the specified state
-     * @throws NullPointerException if the specified {@code id}
-     *                              argument is {@code null}
+     * @param id    the persistent unique identifier of the product
+     * @param sku   the persistent {@link Sku} value object;
+     *              must not be {@code null}
+     * @param name  the persistent product name
+     * @param stock the persistent stock quantity
+     * @param cost  the persistent cost value
+     * @param price the persistent price value
+     * @return a trusted {@link Product} instance populated with the persistent
+     *         state
+     * @throws NullPointerException if the required {@code id} reference is null
      */
     public static Product reconstitute(
             final UUID id,
-            final String sku,
+            final Sku sku,
             final String name,
             final BigDecimal stock,
             final BigDecimal cost,
             final BigDecimal price) {
         Objects.requireNonNull(id, "Product identity (ID) cannot be null during reconstitution");
-
         return new Product(id, sku, name, stock, cost, price);
     }
 
     /**
-     * Updates the product state attributes and re-evaluates internal invariants.
+     * Mutates mutable product attributes and re-evaluates all core domain
+     * invariants.
      *
-     * @param sku   the new stock keeping unit; must not be {@code null} or blank
-     * @param name  the new product name; must be between 5 and 200 characters long
+     * @param sku   the updated raw SKU identifier string; must not be null or blank
+     * @param name  the updated product name; must be between 5 and 200 characters
      *              when trimmed
-     *              and must not be {@code null}
-     * @param stock the new stock quantity; must be a non-negative value, and
-     *              must not be {@code null}
-     * @param cost  the new unit cost value; must be strictly greater than zero, and
-     *              must not be {@code null}
-     * @param price the new consumer selling price; must be strictly greater than
-     *              {@code cost}, and must not be {@code null}
-     * @throws NotificationException if any updated parameter violates domain
+     * @param stock the updated stock quantity; must be a non-negative value
+     * @param cost  the updated unit cost; must be strictly greater than zero
+     * @param price the updated consumer selling price; must be strictly greater
+     *              than the cost
+     * @throws NotificationException if the newly provided state violates domain
      *                               constraints
      */
     public void update(
@@ -169,37 +187,35 @@ public class Product {
             final BigDecimal stock,
             final BigDecimal cost,
             final BigDecimal price) {
-        this.sku = sku;
-        this.name = name;
+        this.name = name != null ? name.trim() : null;
         this.stock = stock;
         this.cost = cost;
         this.price = price;
-        selfValidate();
+        selfValidate(sku);
     }
 
     /**
-     * Asserts the integrity of all internal product attributes against business
-     * rules.
+     * Asserts internal field state validity against business specifications.
      * <p>
-     * Collects all validation violations through a {@link NotificationValidation}
-     * container
-     * and triggers a single aggregate exception if errors are present.
+     * Utilizes a notification container to collect all validation errors found
+     * across fields, throwing a consolidated exception rather than failing
+     * instantly on the first error.
+     * </p>
      *
-     * @throws NotificationException if one or more internal fields fail domain
-     *                               validations
+     * @param rawSku the raw, unvalidated string representation of the SKU
+     * @throws NotificationException if one or more internal attributes fail
+     *                               validation checks
      */
-    private void selfValidate() {
+    private void selfValidate(final String rawSku) {
         final var notification = NotificationValidation.create();
 
-        if (this.sku == null || this.sku.isBlank()) {
-            notification.append(new NotificationError("sku cannot be null or blank"));
-        }
+        // Delegates SKU parsing and validation to its respective value object
+        this.sku = Sku.of(rawSku, notification);
 
         if (this.name == null) {
             notification.append(new NotificationError("name cannot be null"));
-        }
-        if (this.name != null) {
-            final var nameLength = this.name.trim().length();
+        } else {
+            final var nameLength = this.name.length();
             if (nameLength < 5 || nameLength > 200) {
                 notification.append(new NotificationError("name must be between 5 and 200 characters"));
             }
@@ -209,7 +225,7 @@ public class Product {
             notification.append(new NotificationError("stock cannot be null"));
         }
         if (this.stock != null && this.stock.compareTo(BigDecimal.ZERO) < 0) {
-            notification.append(new NotificationError("stock must be positive"));
+            notification.append(new NotificationError("stock cannot be negative"));
         }
 
         if (this.cost == null) {
@@ -227,7 +243,7 @@ public class Product {
         }
 
         if (notification.hasErrors()) {
-            throw new NotificationException("failed to instance new product", notification);
+            throw new NotificationException("Product validation failed", notification);
         }
     }
 }

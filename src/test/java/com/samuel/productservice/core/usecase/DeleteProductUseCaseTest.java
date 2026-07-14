@@ -1,6 +1,5 @@
 package com.samuel.productservice.core.usecase;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.samuel.productservice.core.exception.NotFoundException;
 import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.core.gateway.ProductGateway;
-import com.samuel.productservice.core.model.Product;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;

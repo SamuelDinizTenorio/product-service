@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.samuel.productservice.core.model.Product;
+import com.samuel.productservice.core.model.Sku;
 
 /**
  * Defines the architectural contract for persisting and retrieving
@@ -30,14 +31,14 @@ public interface ProductGateway {
     Optional<Product> findById(UUID id);
 
     /**
-     * Retrieves a product aggregate by its unique stock keeping unit.
+     * Retrieves a product aggregate by its unique stock keeping unit value object.
      *
-     * @param sku the unique {@link String} stock keeping unit to find; must not be
+     * @param sku the unique {@link Sku} domain value object to find; must not be
      *            {@code null}
      * @return an {@link Optional} containing the matching {@link Product}, or an
      *         empty {@link Optional} if no product matches the specified SKU
      */
-    Optional<Product> findBySku(String sku);
+    Optional<Product> findBySku(Sku sku);
 
     /**
      * Persists the state of the given product aggregate.

@@ -1,12 +1,12 @@
 package com.samuel.productservice.core.usecase;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import com.samuel.productservice.core.exception.NotFoundException;
 import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
+import com.samuel.productservice.core.model.Sku;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -46,7 +46,7 @@ class GetProductBySkuUseCaseTest {
                                         .willReturn(Optional.of(expectedProduct));
 
                         // Act
-                        Product actualProduct = getProductBySkuUseCase.execute(productSku);
+                        Product actualProduct = getProductBySkuUseCase.execute(productSku.getValue());
 
                         // Assert
                         assertThat(actualProduct)
@@ -59,14 +59,15 @@ class GetProductBySkuUseCaseTest {
                 @DisplayName("Should throw NotFoundException when the product does not exist in the repository")
                 void shouldThrowNotFoundExceptionWhenProductDoesNotExist() {
                         // Arrange
-                        final var productSku = "SKU-NON-EXISTENT";
+                        final var productSku = Sku.reconstitute("SKU-NON-EXISTENT");
                         given(repository.findBySku(productSku))
                                         .willReturn(Optional.empty());
 
                         // Act & Assert
-                        assertThatThrownBy(() -> getProductBySkuUseCase.execute(productSku))
+                        assertThatThrownBy(() -> getProductBySkuUseCase.execute(productSku.getValue()))
                                         .isInstanceOf(NotFoundException.class)
-                                        .hasMessageContaining(productSku);
+                                        .hasMessageContaining(productSku.getValue());
+
                         verify(repository).findBySku(productSku);
                 }
         }

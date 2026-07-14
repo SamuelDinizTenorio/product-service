@@ -3,6 +3,7 @@ package com.samuel.productservice.core.usecase;
 import com.samuel.productservice.core.exception.NotFoundException;
 import com.samuel.productservice.core.gateway.ProductGateway;
 import com.samuel.productservice.core.model.Product;
+import com.samuel.productservice.core.model.Sku;
 
 import lombok.AllArgsConstructor;
 
@@ -30,7 +31,7 @@ public class GetProductBySkuUseCase {
      *                           the specified {@code sku}
      */
     public Product execute(String sku) {
-        return repository.findBySku(sku)
+        return repository.findBySku(Sku.reconstitute(sku))
                 .orElseThrow(() -> NotFoundException.create("Product not found with SKU: %s".formatted(sku)));
     }
 }

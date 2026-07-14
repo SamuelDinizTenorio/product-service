@@ -37,7 +37,7 @@ public class UpdateProductUseCase {
         var existingProduct = getProductByIdUseCase.execute(id);
 
         existingProduct.update(
-                productData.getSku(),
+                productData.getSku().getValue(),
                 productData.getName(),
                 productData.getStock(),
                 productData.getCost(),

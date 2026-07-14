@@ -1,6 +1,5 @@
 package com.samuel.productservice.core.usecase;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 

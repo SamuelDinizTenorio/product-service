@@ -31,7 +31,8 @@ public class CreateProductUseCase {
      */
     public Product execute(Product newProduct) {
         if (repository.findBySku(newProduct.getSku()).isPresent()) {
-            throw ConflictException.create("Product already exists with SKU: %s".formatted(newProduct.getSku()));
+            throw ConflictException
+                    .create("Product already exists with SKU: %s".formatted(newProduct.getSku().getValue()));
         }
 
         return repository.save(newProduct);

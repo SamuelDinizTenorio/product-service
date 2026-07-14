@@ -3,6 +3,7 @@ package com.samuel.productservice.infrastructure.adapter.persistence.mapper;
 import org.springframework.stereotype.Component;
 
 import com.samuel.productservice.core.model.Product;
+import com.samuel.productservice.core.model.Sku;
 import com.samuel.productservice.infrastructure.adapter.persistence.entity.ProductEntity;
 
 /**
@@ -35,7 +36,7 @@ public class ProductPersistenceMapper {
 
         return ProductEntity.create(
                 product.getId(),
-                product.getSku(),
+                product.getSku().getValue(),
                 product.getName(),
                 product.getStock(),
                 product.getCost(),
@@ -62,7 +63,7 @@ public class ProductPersistenceMapper {
 
         return ProductEntity.create(
                 product.getId(),
-                product.getSku(),
+                product.getSku().getValue(),
                 product.getName(),
                 product.getStock(),
                 product.getCost(),
@@ -88,7 +89,7 @@ public class ProductPersistenceMapper {
 
         return Product.reconstitute(
                 productEntity.getId(),
-                productEntity.getSku(),
+                Sku.reconstitute(productEntity.getSku()),
                 productEntity.getName(),
                 productEntity.getStock(),
                 productEntity.getCost(),

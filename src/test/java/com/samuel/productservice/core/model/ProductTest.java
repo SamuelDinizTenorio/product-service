@@ -30,18 +30,36 @@ class ProductTest {
                 final var thirty = BigDecimal.valueOf(30);
 
                 return Stream.of(
-                                Arguments.of("", "Mouse", ten, twenty, thirty, "sku cannot be null or blank"),
-                                Arguments.of(null, "Mouse", ten, twenty, thirty, "sku cannot be null or blank"),
-                                Arguments.of("SKU-123", null, ten, twenty, thirty, "name cannot be null"),
-                                Arguments.of("SKU-123", "Mouse", null, twenty, thirty, "stock cannot be null"),
-                                Arguments.of("SKU-123", "Mouse", ten, null, thirty, "cost cannot be null"),
-                                Arguments.of("SKU-123", "Mouse", ten, twenty, null, "price cannot be null"),
+                                // SKU Presence & Blank validations
+                                Arguments.of("", "Mouse", ten, twenty, thirty,
+                                                "sku cannot be null or blank"),
+                                Arguments.of(null, "Mouse", ten, twenty, thirty,
+                                                "sku cannot be null or blank"),
+
+                                // NEW: SKU Length & Format validations
+                                Arguments.of("SK", "Mouse", ten, twenty, thirty,
+                                                "sku must be between 3 and 30 characters"),
+                                Arguments.of("A".repeat(31), "Mouse", ten, twenty, thirty,
+                                                "sku must be between 3 and 30 characters"),
+                                Arguments.of("SKU@123", "Mouse", ten, twenty, thirty,
+                                                "sku must contain only alphanumeric characters, hyphens, or underscores"),
+
+                                // Name, Stock, Cost, Price validations
+                                Arguments.of("SKU-123", null, ten, twenty, thirty,
+                                                "name cannot be null"),
+                                Arguments.of("SKU-123", "Mouse", null, twenty, thirty,
+                                                "stock cannot be null"),
+                                Arguments.of("SKU-123", "Mouse", ten, null, thirty,
+                                                "cost cannot be null"),
+                                Arguments.of("SKU-123", "Mouse", ten, twenty, null,
+                                                "price cannot be null"),
                                 Arguments.of("SKU-123", "Mous   ", ten, twenty, thirty,
                                                 "name must be between 5 and 200 characters"),
                                 Arguments.of("SKU-123", bigText, ten, twenty, thirty,
                                                 "name must be between 5 and 200 characters"),
                                 Arguments.of("SKU-123", "Mouse", BigDecimal.valueOf(-1), twenty, thirty,
-                                                "stock must be positive"),
+                                                "stock cannot be negative"),
+
                                 Arguments.of("SKU-123", "Mouse", ten, BigDecimal.ZERO, thirty,
                                                 "cost must be greater than zero"),
                                 Arguments.of("SKU-123", "Mouse", ten, twenty, twenty,
@@ -59,7 +77,7 @@ class ProductTest {
                         final var id = UUID.randomUUID();
                         final var productA = Product.reconstitute(
                                         id,
-                                        "SKU-1",
+                                        Sku.reconstitute("SKU-1"),
                                         "Mouse",
                                         BigDecimal.TEN,
                                         BigDecimal.TEN,
@@ -110,7 +128,7 @@ class ProductTest {
                         assertThat(product.getId())
                                         .isNotNull()
                                         .isInstanceOf(UUID.class);
-                        assertThat(product.getSku()).isEqualTo(expectedSku);
+                        assertThat(product.getSku()).isEqualTo(Sku.reconstitute(expectedSku));
                         assertThat(product.getName()).isEqualTo(expectedName);
                         assertThat(product.getStock()).isEqualByComparingTo(expectedStock);
                         assertThat(product.getCost()).isEqualByComparingTo(expectedCost);
@@ -154,7 +172,7 @@ class ProductTest {
                                         .containsExactlyInAnyOrder(
                                                         "sku cannot be null or blank",
                                                         "name cannot be null",
-                                                        "stock must be positive",
+                                                        "stock cannot be negative",
                                                         "price must be greater than cost");
                 }
         }
@@ -168,7 +186,8 @@ class ProductTest {
                 void shouldReconstituteProduct() {
                         // Arrange
                         final var expectedId = UUID.randomUUID();
-                        final var expectedSku = "SKU-123";
+                        final var expectedSkuValue = "SKU-123";
+                        final var expectedSku = Sku.reconstitute(expectedSkuValue);
                         final var expectedName = "Mouse";
                         final var expectedStock = BigDecimal.valueOf(50);
                         final var expectedCost = BigDecimal.valueOf(10.50);
@@ -198,63 +217,18 @@ class ProductTest {
                 void shouldThrowExceptionWhenIdIsNull() {
                         // Arrange
                         final UUID nullId = null;
-                        final var validSku = "SKU-123";
+                        final var validSku = Sku.reconstitute("SKU-123");
                         final var validName = "Mouse";
                         final var validStock = BigDecimal.TEN;
                         final var validCost = BigDecimal.TEN;
                         final var validPrice = BigDecimal.valueOf(20);
 
                         // Act & Assert
-                        assertThatThrownBy(() -> Product.reconstitute(nullId, validSku, validName, validStock,
-                                        validCost, validPrice))
+                        assertThatThrownBy(() -> Product.reconstitute(
+                                        nullId, validSku, validName, validStock, validCost, validPrice))
                                         .isInstanceOf(NullPointerException.class)
                                         .hasMessageContaining(
                                                         "Product identity (ID) cannot be null during reconstitution");
-                }
-
-                @ParameterizedTest
-                @MethodSource("com.samuel.productservice.core.model.ProductTest#getPossiblesOfValueProduct")
-                @DisplayName("Should not reconstitute product if persistent data violates domain rules")
-                void shouldNotReconstituteProductWithInvalidData(String sku, String name, BigDecimal stock,
-                                BigDecimal cost, BigDecimal price, String expectedMessage) {
-                        // Arrange
-                        final var existingId = UUID.randomUUID();
-
-                        // Act & Assert
-                        assertThatThrownBy(() -> Product.reconstitute(existingId, sku, name, stock, cost, price))
-                                        .isInstanceOf(NotificationException.class)
-                                        .asInstanceOf(throwable(NotificationException.class))
-                                        .extracting(NotificationException::getErrors)
-                                        .asInstanceOf(list(NotificationError.class))
-                                        .extracting(NotificationError::message)
-                                        .contains(expectedMessage);
-                }
-
-                @Test
-                @DisplayName("Should collect multiple errors on reconstitution if data is severely corrupted")
-                void shouldCollectMultipleErrorsOnReconstitution() {
-                        // Arrange
-                        final var existingId = UUID.randomUUID();
-                        final String invalidSku = "";
-                        final String invalidName = null;
-                        final BigDecimal invalidStock = BigDecimal.valueOf(-5);
-                        final BigDecimal validCost = BigDecimal.valueOf(10);
-                        final BigDecimal invalidPrice = BigDecimal.valueOf(2);
-
-                        // Act & Assert
-                        assertThatThrownBy(() -> Product.reconstitute(existingId, invalidSku, invalidName, invalidStock,
-                                        validCost, invalidPrice))
-                                        .isInstanceOf(NotificationException.class)
-                                        .asInstanceOf(throwable(NotificationException.class))
-                                        .extracting(NotificationException::getErrors)
-                                        .asInstanceOf(list(NotificationError.class))
-                                        .hasSize(4)
-                                        .extracting(NotificationError::message)
-                                        .containsExactlyInAnyOrder(
-                                                        "sku cannot be null or blank",
-                                                        "name cannot be null",
-                                                        "stock must be positive",
-                                                        "price must be greater than cost");
                 }
         }
 
@@ -285,7 +259,7 @@ class ProductTest {
 
                         // Assert
                         assertThat(product.getId()).isEqualTo(expectedId);
-                        assertThat(product.getSku()).isEqualTo(expectedSku);
+                        assertThat(product.getSku()).isEqualTo(Sku.reconstitute(expectedSku));
                         assertThat(product.getName()).isEqualTo(expectedName);
                         assertThat(product.getStock()).isEqualByComparingTo(expectedStock);
                         assertThat(product.getCost()).isEqualByComparingTo(expectedCost);
@@ -334,7 +308,7 @@ class ProductTest {
                                         .containsExactlyInAnyOrder(
                                                         "sku cannot be null or blank",
                                                         "name cannot be null",
-                                                        "stock must be positive",
+                                                        "stock cannot be negative",
                                                         "price must be greater than cost");
                 }
         }

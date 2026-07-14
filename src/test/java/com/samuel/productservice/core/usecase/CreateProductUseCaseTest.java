@@ -1,6 +1,5 @@
 package com.samuel.productservice.core.usecase;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -74,7 +73,7 @@ class CreateProductUseCaseTest {
                         // Act & Assert
                         assertThatThrownBy(() -> createProductUseCase.execute(newProduct))
                                         .isInstanceOf(ConflictException.class)
-                                        .hasMessageContaining(productSku);
+                                        .hasMessageContaining(productSku.getValue());
 
                         verify(repository).findBySku(productSku);
                         verify(repository, never()).save(any());

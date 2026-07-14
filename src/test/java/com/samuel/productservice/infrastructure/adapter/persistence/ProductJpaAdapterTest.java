@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 
 import com.samuel.productservice.core.model.Product;
+import com.samuel.productservice.core.model.Sku;
 import com.samuel.productservice.core.fixture.ProductFixture;
 import com.samuel.productservice.infrastructure.adapter.persistence.mapper.ProductPersistenceMapper;
 import com.samuel.productservice.infrastructure.config.BaseContainersIntegrationTest;
@@ -108,8 +109,11 @@ class ProductJpaAdapterTest extends BaseContainersIntegrationTest {
         @Test
         @DisplayName("Should return empty optional when product SKU does not exist")
         void shouldReturnEmptyWhenSkuNotFound() {
+            // Arrange
+            final var notExistingSku = Sku.reconstitute("NON-EXISTENT-SKU-999");
+
             // Act
-            var foundProduct = productJpaAdapter.findBySku("NON-EXISTENT-SKU-999");
+            var foundProduct = productJpaAdapter.findBySku(notExistingSku);
 
             // Assert
             assertThat(foundProduct).isEmpty();
@@ -193,7 +197,7 @@ class ProductJpaAdapterTest extends BaseContainersIntegrationTest {
                     .isPresent()
                     .hasValueSatisfying(entity -> {
                         assertThat(entity.getId()).isEqualTo(product.getId());
-                        assertThat(entity.getSku()).isEqualTo(product.getSku());
+                        assertThat(entity.getSku()).isEqualTo(product.getSku().getValue());
                         assertThat(entity.getName()).isEqualTo(product.getName());
                         assertThat(entity.getStock()).isEqualByComparingTo(product.getStock());
                         assertThat(entity.getCost()).isEqualByComparingTo(product.getCost());
@@ -250,7 +254,7 @@ class ProductJpaAdapterTest extends BaseContainersIntegrationTest {
                     .isPresent()
                     .hasValueSatisfying(entity -> {
                         assertThat(entity.getId()).isEqualTo(updatedProduct.getId());
-                        assertThat(entity.getSku()).isEqualTo(updatedProduct.getSku());
+                        assertThat(entity.getSku()).isEqualTo(updatedProduct.getSku().getValue());
                         assertThat(entity.getName()).isEqualTo(updatedProduct.getName());
                         assertThat(entity.getStock()).isEqualByComparingTo(updatedProduct.getStock());
                         assertThat(entity.getCost()).isEqualByComparingTo(updatedProduct.getCost());
