@@ -1,16 +1,16 @@
 package com.samuel.productservice.infrastructure.adapter.persistence.mapper;
 
-import com.samuel.productservice.core.fixture.ProductFixture;
-import com.samuel.productservice.infrastructure.adapter.persistence.fixture.ProductEntityFixture;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.samuel.productservice.core.fixture.ProductFixture;
+import com.samuel.productservice.infrastructure.adapter.persistence.fixture.ProductEntityFixture;
 
 @DisplayName("ProductPersistenceMapper Unit Tests")
 class ProductPersistenceMapperTest {
@@ -22,8 +22,8 @@ class ProductPersistenceMapperTest {
     class ToNewEntity {
 
         @Test
-        @DisplayName("Should map domain Product to ProductEntity flagged as isNew=true")
-        void shouldMapToNewEntity() {
+        @DisplayName("Should map domain Product into new ProductEntity persistence record")
+        void shouldMapProductToNewProductEntity() {
             // Arrange
             final var product = ProductFixture.any();
 
@@ -34,7 +34,7 @@ class ProductPersistenceMapperTest {
             assertThat(entity)
                     .isNotNull()
                     .usingRecursiveComparison()
-                    .ignoringFields("sku", "isNew") // isNew does not exist in the Domain, so we ignore it.
+                    .ignoringFields("sku", "isNew")
                     .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
                     .isEqualTo(product);
 
@@ -43,7 +43,7 @@ class ProductPersistenceMapperTest {
         }
 
         @Test
-        @DisplayName("Should return null when source product is null")
+        @DisplayName("Should return null when product is null")
         void shouldReturnNullWhenProductIsNull() {
             // Act
             final var entity = mapper.toNewEntity(null);
@@ -58,8 +58,8 @@ class ProductPersistenceMapperTest {
     class ToUpdateEntity {
 
         @Test
-        @DisplayName("Should map domain Product to ProductEntity flagged as isNew=false")
-        void shouldMapToUpdateEntity() {
+        @DisplayName("Should map domain Product into existing ProductEntity persistence record")
+        void shouldMapProductToUpdateProductEntity() {
             // Arrange
             final var existingId = UUID.randomUUID();
             final var product = ProductFixture.reconstituteWithId(existingId);
@@ -71,17 +71,16 @@ class ProductPersistenceMapperTest {
             assertThat(entity)
                     .isNotNull()
                     .usingRecursiveComparison()
-                    .ignoringFields("sku", "isNew") // isNew does not exist in the Domain, so we ignore it.
+                    .ignoringFields("sku", "isNew")
                     .withComparatorForType(BigDecimal::compareTo, BigDecimal.class)
                     .isEqualTo(product);
 
             assertThat(entity.isNew()).isFalse();
             assertThat(entity.getSku()).isEqualTo(product.getSku().getValue());
-
         }
 
         @Test
-        @DisplayName("Should return null when source product is null")
+        @DisplayName("Should return null when product is null")
         void shouldReturnNullWhenProductIsNull() {
             // Act
             final var entity = mapper.toUpdateEntity(null);
@@ -96,8 +95,8 @@ class ProductPersistenceMapperTest {
     class ToDomain {
 
         @Test
-        @DisplayName("Should reconstitute ProductEntity into domain Product aggregate")
-        void shouldMapToDomain() {
+        @DisplayName("Should map ProductEntity into domain Product aggregate")
+        void shouldMapProductEntityToDomainProductAggregate() {
             // Arrange
             final var expectedId = UUID.randomUUID();
             final var entity = ProductEntityFixture.createWithId(expectedId);
@@ -117,8 +116,8 @@ class ProductPersistenceMapperTest {
         }
 
         @Test
-        @DisplayName("Should return null when source entity is null")
-        void shouldReturnNullWhenEntityIsNull() {
+        @DisplayName("Should return null when productEntity is null")
+        void shouldReturnNullWhenProductEntityIsNull() {
             // Act
             final var product = mapper.toDomain(null);
 

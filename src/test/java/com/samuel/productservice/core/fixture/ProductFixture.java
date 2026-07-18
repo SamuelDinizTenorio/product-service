@@ -42,8 +42,8 @@ public class ProductFixture {
      * creation,
      * simulating an aggregate loaded from a datastore.
      *
-     * @param id the unique {@link UUID} of the product to reconstitute; must not be
-     *           {@code null}
+     * @param id the unique {@link UUID} of the product to reconstitute; 
+     *           must not be {@code null}
      * @return a reconstituted {@link Product} instance containing the given
      *         identifier
      */
